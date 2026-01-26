@@ -1,0 +1,28 @@
+# Configuração de perfis de extração de código
+# Cada perfil define padrões regex para encontrar códigos de documentos
+
+profiles:
+  RIR:
+    description: "Registro de Inspeção e Recebimento"
+    patterns:
+      # Padrão para códigos RIR no formato: CZ6_RNEST_U22_3.1.1.1_CVL_RIR_B-22026A
+      - "([A-Z0-9]+_[A-Z0-9]+_[A-Z0-9]+_[0-9.]+_[A-Z]+_RIR_[A-Z0-9-]+)"
+      # Padrão alternativo mais genérico
+      - "Código do Documento:\\s*([A-Z0-9_-]+)"
+      # Padrão para capturar após "Código:"
+      - "Código:\\s*([A-Z0-9_-]+)"
+  
+  PID:
+    description: "Piping and Instrumentation Diagram"
+    patterns:
+      # Padrão para códigos PID
+      - "([A-Z0-9]+_[A-Z0-9]+_[A-Z0-9]+_[0-9.]+_[A-Z]+_PID_[A-Z0-9-]+)"
+      - "Código do Documento:\\s*([A-Z0-9_-]+)"
+  
+  GENERIC:
+    description: "Padrão genérico para qualquer documento"
+    patterns:
+      # Tenta capturar qualquer código após "Código do Documento:"
+      - "Código do Documento:\\s*([A-Z0-9_-]+)"
+      # Tenta capturar códigos no formato geral
+      - "([A-Z0-9]+(?:_[A-Z0-9]+){3,}_[A-Z0-9-]+)"
