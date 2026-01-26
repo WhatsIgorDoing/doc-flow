@@ -38,10 +38,11 @@ Bem-vindo à documentação completa do SAD_APP v2.0. Este diretório contém to
 
 ### 🔍 Auditoria Técnica
 
-| Documento                                                | Descrição                                                  |
-| -------------------------------------------------------- | ---------------------------------------------------------- |
-| **[09a_sumario_auditoria.md](09a_sumario_auditoria.md)** | ⭐ **Sumário executivo** - Recomendado para leitura rápida  |
-| **[09_auditoria_tecnica.md](09_auditoria_tecnica.md)**   | Relatório completo de auditoria técnica e análise de stack |
+| Documento                                                        | Descrição                                                  |
+| ---------------------------------------------------------------- | ---------------------------------------------------------- |
+| **[00_DIAGNOSTICO_TECNICO_REFATORACAO.md](00_DIAGNOSTICO_TECNICO_REFATORACAO.md)** | 🆕 **Diagnóstico de Migração** - Análise para refatoração Local-First (FastAPI + NiceGUI + SQLite) |
+| **[09a_sumario_auditoria.md](09a_sumario_auditoria.md)**         | ⭐ **Sumário executivo** - Recomendado para leitura rápida  |
+| **[09_auditoria_tecnica.md](09_auditoria_tecnica.md)**           | Relatório completo de auditoria técnica e análise de stack |
 
 ### 💼 Análise de Negócio
 
@@ -49,6 +50,12 @@ Bem-vindo à documentação completa do SAD_APP v2.0. Este diretório contém to
 | ---------------------------------------------------------------- | --------------------------------------------------------------------- |
 | **[10a_resumo_visual_negocio.md](10a_resumo_visual_negocio.md)** | ⭐ **Resumo visual** - Guia rápido com diagramas e exemplos            |
 | **[10_analise_negocio.md](10_analise_negocio.md)**               | Mapeamento completo de entidades, relacionamentos e regras de negócio |
+
+### 📊 Estratégia
+
+| Documento                                                    | Descrição                                                           |
+| ------------------------------------------------------------ | ------------------------------------------------------------------- |
+| **[RELATÓRIO ESTRATÉGICO.md](RELATÓRIO%20ESTRATÉGICO.md)**   | Análise estratégica e visão de longo prazo com gargalos arquiteturais |
 
 ### 🎁 Análise de Produto
 
