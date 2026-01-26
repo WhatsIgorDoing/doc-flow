@@ -8,6 +8,15 @@ Bem-vindo à documentação completa do SAD_APP v2.0. Este diretório contém to
 
 ## 📋 Índice de Documentos
 
+### 🏗️ Arquitetura e Refatoração
+
+| Documento                                                                              | Descrição                                                        |
+| -------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| **[00_DIAGNOSTICO_TECNICO_REFATORACAO.md](00_DIAGNOSTICO_TECNICO_REFATORACAO.md)**   | Análise técnica completa da arquitetura legada e plano de migração para Local-First |
+| **[01_VALIDACAO_SETUP_WAVE1.md](01_VALIDACAO_SETUP_WAVE1.md)**                       | Relatório de QA e validação do skeleton inicial (Backend Isolation) |
+| **[02_WAVE2_MIGRACAO_CORE.md](02_WAVE2_MIGRACAO_CORE.md)**                           | Migração da lógica core para arquitetura assíncrona com FastAPI |
+| **[03_RELATORIO_INTEGRIDADE_WAVE2.md](03_RELATORIO_INTEGRIDADE_WAVE2.md)**           | Auditoria de integridade da Wave 2 com checklist de aprovação (Score: 9.0/10) |
+
 ### 📊 Análises e Relatórios
 
 | Documento                                          | Descrição                                                 |

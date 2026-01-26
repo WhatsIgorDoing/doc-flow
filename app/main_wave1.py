@@ -11,6 +11,7 @@ from nicegui import ui
 from app.core.config import settings
 from app.core.logger import app_logger
 from app.infrastructure.database import DatabaseManager
+from app.api.endpoints import router as api_router
 
 
 # Database manager global
@@ -42,6 +43,9 @@ async def lifespan(app: FastAPI):
 
 # FastAPI app com lifecycle
 app = FastAPI(title=settings.APP_NAME, version=settings.APP_VERSION, lifespan=lifespan)
+
+# Registra rotas da API
+app.include_router(api_router)
 
 
 @ui.page("/")
