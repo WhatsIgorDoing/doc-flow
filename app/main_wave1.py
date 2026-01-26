@@ -13,6 +13,9 @@ from app.core.logger import app_logger
 from app.infrastructure.database import DatabaseManager
 from app.api.endpoints import router as api_router
 
+# Import UI pages (registers @ui.page routes)
+from app.ui.pages import dashboard  # noqa: F401
+
 
 # Database manager global
 db = DatabaseManager()
@@ -47,22 +50,10 @@ app = FastAPI(title=settings.APP_NAME, version=settings.APP_VERSION, lifespan=li
 # Registra rotas da API
 app.include_router(api_router)
 
+# Note: UI pages are registered via @ui.page decorators on import
 
-@ui.page("/")
-def index_page():
-    """Página inicial minimalista mostrando que o backend está online."""
-    with ui.column().classes("w-full items-center justify-center h-screen"):
-        ui.label("SAD App v2 - Backend Online").classes("text-h3 text-primary")
-        ui.label(f"Versão: {settings.APP_VERSION}").classes("text-subtitle1 text-grey")
-        ui.label(f"Ambiente: {settings.ENVIRONMENT}").classes("text-caption")
 
-        # Status do banco de dados
-        with ui.card().classes("mt-8 p-4"):
-            ui.label("🗄️ Status do Sistema").classes("text-h6 mb-2")
-            ui.label(f"Banco de dados: {settings.get_database_path()}").classes(
-                "text-body2"
-            )
-            ui.label("✅ Database inicializado").classes("text-positive")
+# Removed old index page - replaced by dashboard in app.ui.pages.dashboard
 
 
 def main():
