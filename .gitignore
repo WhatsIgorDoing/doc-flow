@@ -71,3 +71,8 @@ scripts/
 *.pem
 secrets/
 .env
+
+# Runtime data
+data/
+*.db
+.device_id

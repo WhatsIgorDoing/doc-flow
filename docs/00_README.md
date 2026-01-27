@@ -8,6 +8,15 @@ Bem-vindo à documentação completa do SAD_APP v2.0. Este diretório contém to
 
 ## 📋 Índice de Documentos
 
+### 🏗️ Arquitetura e Refatoração
+
+| Documento                                                                              | Descrição                                                        |
+| -------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| **[00_DIAGNOSTICO_TECNICO_REFATORACAO.md](00_DIAGNOSTICO_TECNICO_REFATORACAO.md)**   | Análise técnica completa da arquitetura legada e plano de migração para Local-First |
+| **[01_VALIDACAO_SETUP_WAVE1.md](01_VALIDACAO_SETUP_WAVE1.md)**                       | Relatório de QA e validação do skeleton inicial (Backend Isolation) |
+| **[02_WAVE2_MIGRACAO_CORE.md](02_WAVE2_MIGRACAO_CORE.md)**                           | Migração da lógica core para arquitetura assíncrona com FastAPI |
+| **[03_RELATORIO_INTEGRIDADE_WAVE2.md](03_RELATORIO_INTEGRIDADE_WAVE2.md)**           | Auditoria de integridade da Wave 2 com checklist de aprovação (Score: 9.0/10) |
+
 ### 📊 Análises e Relatórios
 
 | Documento                                          | Descrição                                                 |
@@ -38,10 +47,11 @@ Bem-vindo à documentação completa do SAD_APP v2.0. Este diretório contém to
 
 ### 🔍 Auditoria Técnica
 
-| Documento                                                | Descrição                                                  |
-| -------------------------------------------------------- | ---------------------------------------------------------- |
-| **[09a_sumario_auditoria.md](09a_sumario_auditoria.md)** | ⭐ **Sumário executivo** - Recomendado para leitura rápida  |
-| **[09_auditoria_tecnica.md](09_auditoria_tecnica.md)**   | Relatório completo de auditoria técnica e análise de stack |
+| Documento                                                        | Descrição                                                  |
+| ---------------------------------------------------------------- | ---------------------------------------------------------- |
+| **[00_DIAGNOSTICO_TECNICO_REFATORACAO.md](00_DIAGNOSTICO_TECNICO_REFATORACAO.md)** | 🆕 **Diagnóstico de Migração** - Análise para refatoração Local-First (FastAPI + NiceGUI + SQLite) |
+| **[09a_sumario_auditoria.md](09a_sumario_auditoria.md)**         | ⭐ **Sumário executivo** - Recomendado para leitura rápida  |
+| **[09_auditoria_tecnica.md](09_auditoria_tecnica.md)**           | Relatório completo de auditoria técnica e análise de stack |
 
 ### 💼 Análise de Negócio
 
@@ -49,6 +59,12 @@ Bem-vindo à documentação completa do SAD_APP v2.0. Este diretório contém to
 | ---------------------------------------------------------------- | --------------------------------------------------------------------- |
 | **[10a_resumo_visual_negocio.md](10a_resumo_visual_negocio.md)** | ⭐ **Resumo visual** - Guia rápido com diagramas e exemplos            |
 | **[10_analise_negocio.md](10_analise_negocio.md)**               | Mapeamento completo de entidades, relacionamentos e regras de negócio |
+
+### 📊 Estratégia
+
+| Documento                                                    | Descrição                                                           |
+| ------------------------------------------------------------ | ------------------------------------------------------------------- |
+| **[RELATÓRIO ESTRATÉGICO.md](RELATÓRIO%20ESTRATÉGICO.md)**   | Análise estratégica e visão de longo prazo com gargalos arquiteturais |
 
 ### 🎁 Análise de Produto
 
