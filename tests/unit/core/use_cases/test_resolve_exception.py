@@ -1,87 +1,83 @@
-﻿from pathlib import Path
-from unittest.mock import MagicMock
+﻿import pytest
+from pathlib import Path
+from unittest.mock import AsyncMock, MagicMock
 
-import pytest
+from app.domain.entities import DocumentFile, DocumentStatus, ManifestItem
+from app.use_cases.resolve_exception import ResolveExceptionUseCase
+from app.core.interfaces import CodeNotInManifestError, ExtractionFailedError
 
-from src.sad_app_v2.core.domain import DocumentFile, DocumentStatus, ManifestItem
-from src.sad_app_v2.core.interfaces import (
-    CodeNotInManifestError,
-    ExtractionFailedError,
-)
-from src.sad_app_v2.core.use_cases.resolve_exception import (
-    ResolveUnrecognizedFileUseCase,
-)
-
-# Dados de teste reutilizáveis
-FAKE_FILE = DocumentFile(
-    path=Path("unrecognized.pdf"),
-    size_bytes=100,
-    status=DocumentStatus.UNRECOGNIZED
-)
-MANIFEST_LIST = [
-    ManifestItem("DOC-RESOLVED", "A", "Documento Resolvido"),
-    ManifestItem("DOC-OTHER", "B", "Outro Documento"),
-]
-
-
-def test_resolve_exception_happy_path():
-    """Verifica o cenário de sucesso onde o código é extraído e encontrado."""
+@pytest.mark.asyncio
+async def test_resolve_success():
+    """Testa recuperação de arquivo com sucesso."""
     # Setup
+    manifest_item = ManifestItem("DOC-123", "0", "Documento Exemplo")
+    file_to_resolve = DocumentFile(path=Path("strange_name.pdf"), size_bytes=0)
+    
     mock_content_extractor = MagicMock()
-    mock_content_extractor.extract_text.return_value = (
-        "Texto contendo Relatório: DOC-RESOLVED_A"
-    )
-
+    mock_content_extractor.extract_text = AsyncMock(return_value="Conteúdo com DOC-123 no meio")
+    
     mock_code_extractor = MagicMock()
-    mock_code_extractor.find_code.return_value = "DOC-RESOLVED_A"
+    mock_code_extractor.find_code = AsyncMock(return_value="DOC-123")
 
-    use_case = ResolveUnrecognizedFileUseCase(
-        mock_content_extractor, mock_code_extractor
+    use_case = ResolveExceptionUseCase(
+        content_extractor=mock_content_extractor,
+        code_extractor=mock_code_extractor
     )
 
     # Execução
-    resolved_file = use_case.execute(
-        file_to_resolve=FAKE_FILE,
-        profile_id="RIR",
-        all_manifest_items=MANIFEST_LIST
+    resolved_file = await use_case.execute(
+        file_to_resolve=file_to_resolve,
+        profile_id="GENERIC",
+        all_manifest_items=[manifest_item]
     )
 
     # Verificação
     assert resolved_file.status == DocumentStatus.VALIDATED
-    assert resolved_file.associated_manifest_item.document_code == "DOC-RESOLVED"
+    assert resolved_file.associated_manifest_item.document_code == "DOC-123"
 
-
-def test_resolve_exception_extraction_fails():
-    """Verifica se a exceção correta é lançada quando o código não é encontrado."""
-    # Setup
+@pytest.mark.asyncio
+async def test_resolve_extraction_failed():
+    """Testa falha quando nenhum código é encontrado."""
+    file_to_resolve = DocumentFile(path=Path("empty.pdf"), size_bytes=0)
+    
     mock_content_extractor = MagicMock()
-    mock_content_extractor.extract_text.return_value = "Texto sem nenhum codigo"
-
+    mock_content_extractor.extract_text = AsyncMock(return_value="Texto sem código")
+    
     mock_code_extractor = MagicMock()
-    mock_code_extractor.find_code.return_value = None  # Simula falha na extração
+    mock_code_extractor.find_code = AsyncMock(return_value=None)
 
-    use_case = ResolveUnrecognizedFileUseCase(
-        mock_content_extractor, mock_code_extractor
+    use_case = ResolveExceptionUseCase(
+        content_extractor=mock_content_extractor,
+        code_extractor=mock_code_extractor
     )
 
-    # Execução e Verificação
     with pytest.raises(ExtractionFailedError):
-        use_case.execute(FAKE_FILE, "RIR", MANIFEST_LIST)
+        await use_case.execute(
+            file_to_resolve=file_to_resolve,
+            profile_id="GENERIC",
+            all_manifest_items=[]
+        )
 
-
-def test_resolve_exception_code_not_in_manifest():
-    """Verifica exceção quando código é extraído mas não existe no manifesto."""
-    # Setup
+@pytest.mark.asyncio
+async def test_resolve_code_not_in_manifest():
+    """Testa falha quando código é encontrado mas não está no manifesto."""
+    file_to_resolve = DocumentFile(path=Path("unknown.pdf"), size_bytes=0)
+    
     mock_content_extractor = MagicMock()
-    mock_content_extractor.extract_text.return_value = "Relatório: DOC-UNKNOWN"
-
+    mock_content_extractor.extract_text = AsyncMock(return_value="DOC-999")
+    
     mock_code_extractor = MagicMock()
-    mock_code_extractor.find_code.return_value = "DOC-UNKNOWN"
+    mock_code_extractor.find_code = AsyncMock(return_value="DOC-999")
 
-    use_case = ResolveUnrecognizedFileUseCase(
-        mock_content_extractor, mock_code_extractor
+    use_case = ResolveExceptionUseCase(
+        content_extractor=mock_content_extractor,
+        code_extractor=mock_code_extractor
     )
 
-    # Execução e Verificação
+    # Manifesto vazio, então DOC-999 não será encontrado
     with pytest.raises(CodeNotInManifestError):
-        use_case.execute(FAKE_FILE, "RIR", MANIFEST_LIST)
+        await use_case.execute(
+            file_to_resolve=file_to_resolve,
+            profile_id="GENERIC",
+            all_manifest_items=[]
+        )

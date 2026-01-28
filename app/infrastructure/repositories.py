@@ -11,9 +11,15 @@ import aiofiles
 import openpyxl
 from openpyxl.worksheet.worksheet import Worksheet
 
+from app.core.interfaces import (
+    IFileRepository,
+    IFileSystemManager,
+    IManifestRepository,
+)
 from app.core.logger import app_logger
 from app.domain.entities import DocumentFile, ManifestItem
 from app.domain.exceptions import (
+    FileOperationError,
     FileReadError,
     ManifestParseError,
     ManifestReadError,
@@ -21,7 +27,7 @@ from app.domain.exceptions import (
 )
 
 
-class ManifestRepository:
+class ManifestRepository(IManifestRepository):
     """Repositório para leitura de manifestos Excel de forma assíncrona."""
 
     async def load_from_file(self, file_path: Path) -> List[ManifestItem]:
@@ -113,7 +119,7 @@ class ManifestRepository:
         return items
 
 
-class FileRepository:
+class FileRepository(IFileRepository):
     """Repositório para operações com arquivos do sistema de forma assíncrona."""
 
     async def list_files(self, directory: Path) -> List[DocumentFile]:
@@ -188,7 +194,7 @@ class FileRepository:
         return found_files
 
 
-class FileSystemManager:
+class FileSystemManager(IFileSystemManager):
     """Gerenciador de operações do sistema de arquivos de forma assíncrona."""
 
     async def create_directory(self, path: Path) -> None:
@@ -287,7 +293,3 @@ class FileSystemManager:
                 },
             )
             raise FileOperationError(f"Failed to copy {source} to {destination}: {e}")
-
-
-# Importa a exceção que faltou
-from app.domain.exceptions import FileOperationError

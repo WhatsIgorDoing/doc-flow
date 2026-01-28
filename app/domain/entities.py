@@ -12,10 +12,10 @@ from typing import Any, Dict, List, Optional
 class DocumentStatus(enum.Enum):
     """Status de validação de um documento."""
 
-    UNVALIDATED = "not_validated"
-    VALIDATED = "validated"
-    UNRECOGNIZED = "unrecognized"
-    ERROR = "error"
+    UNVALIDATED = "Não Validado"
+    VALIDATED = "Validado"
+    UNRECOGNIZED = "Não Reconhecido"
+    ERROR = "Erro"
 
 
 @dataclass
