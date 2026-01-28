@@ -38,20 +38,35 @@ python -m venv venv
 pip install -r requirements.txt
 ```
 
+
 ### 3. Configurar variáveis de ambiente
 
 Copie `.env.example` para `.env` e configure:
 
 ```env
+# OBRIGATÓRIO: Gere uma chave segura
+SECRET_KEY=sua-chave-secreta-aqui
+
+# Supabase (opcional para desenvolvimento)
 SUPABASE_URL=https://seu-projeto.supabase.co
 SUPABASE_KEY=sua-chave-anon
+SUPABASE_ENABLED=true
 ```
+
+**Gerar SECRET_KEY seguro:**
+
+```powershell
+python -c "import secrets; print(secrets.token_urlsafe(32))"
+```
+
+> ⚠️ **IMPORTANTE:** A aplicação **não iniciará** sem um `SECRET_KEY` válido configurado no `.env`.
 
 ### 4. Executar aplicação
 
 ```powershell
 python -m app.main
 ```
+
 
 ## 📊 Schema do Supabase
 
@@ -92,6 +107,34 @@ O sistema implementa sincronização automática:
 - ✅ **Online + Sincronizado**: Todos os eventos foram enviados
 - 🟡 **Online + Pendentes**: Há eventos aguardando envio
 - 🔴 **Offline**: Sem conexão, eventos acumulando localmente
+
+## 🧪 Testes
+
+### Executar todos os testes
+
+```powershell
+python -m pytest
+```
+
+### Executar com cobertura
+
+```powershell
+python -m pytest --cov=app --cov=src --cov-report=html
+```
+
+### Executar apenas testes unitários
+
+```powershell
+python -m pytest tests/unit/
+```
+
+### Executar apenas testes de integração
+
+```powershell
+python -m pytest tests/integration/
+```
+
+**Status Atual:** 48 testes coletados, 47 passando (97.9% de sucesso)
 
 ## 🛠️ Desenvolvimento
 

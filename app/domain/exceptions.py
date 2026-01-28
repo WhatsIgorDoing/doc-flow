@@ -113,3 +113,24 @@ class OrganizationError(DomainError):
     """Erro durante organização de lotes."""
 
     pass
+
+
+# === Exceções de Resolução de Arquivo ===
+
+
+class ResolutionError(DomainError):
+    """Erro durante resolução de arquivos não reconhecidos."""
+
+    pass
+
+
+class ExtractionFailedError(ResolutionError):
+    """Erro quando a extração de código falha."""
+
+    pass
+
+
+class CodeNotInManifestError(ResolutionError):
+    """Erro quando o código extraído não existe no manifesto."""
+
+    pass

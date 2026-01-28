@@ -44,36 +44,46 @@ class ValidationDashboard:
             picker_type: 'file' for file picker, 'folder' for folder picker
         """
 
+        from nicegui import run
+
         async def pick_path():
-            try:
-                import tkinter as tk
-                from tkinter import filedialog
+            def _open_picker():
+                try:
+                    import tkinter as tk
+                    from tkinter import filedialog
+                    
+                    # Create hidden tkinter root
+                    root = tk.Tk()
+                    root.withdraw()
+                    root.attributes("-topmost", True)
+                    
+                    result = None
+                    if picker_type == "file":
+                        result = filedialog.askopenfilename(
+                            title="Selecione o Manifesto Excel",
+                            filetypes=[
+                                ("Excel files", "*.xlsx *.xls"),
+                                ("All files", "*.*"),
+                            ],
+                        )
+                    else:  # folder
+                        result = filedialog.askdirectory(
+                            title="Selecione a Pasta de Documentos"
+                        )
+                    
+                    root.destroy()
+                    return result
+                except Exception as e:
+                    return e
 
-                # Create hidden tkinter root
-                root = tk.Tk()
-                root.withdraw()
-                root.attributes("-topmost", True)
+            # Executa em thread separada para não bloquear
+            result = await run.io_bound(_open_picker)
 
-                if picker_type == "file":
-                    path = filedialog.askopenfilename(
-                        title="Selecione o Manifesto Excel",
-                        filetypes=[
-                            ("Excel files", "*.xlsx *.xls"),
-                            ("All files", "*.*"),
-                        ],
-                    )
-                else:  # folder
-                    path = filedialog.askdirectory(
-                        title="Selecione a Pasta de Documentos"
-                    )
-
-                root.destroy()
-
-                if path:
-                    input_field.value = path
-                    self.log_viewer.info(f"Caminho selecionado: {path}")
-            except Exception as e:
-                self.log_viewer.error(f"Erro ao abrir seletor: {e}")
+            if isinstance(result, Exception):
+                 self.log_viewer.error(f"Erro ao abrir seletor: {result}")
+            elif result:
+                input_field.value = result
+                self.log_viewer.info(f"Caminho selecionado: {result}")
 
         ui.button(icon="folder_open", on_click=pick_path).props("flat").tooltip(
             "Abrir seletor de arquivos"
