@@ -65,7 +65,7 @@ class OrganizationRequest(BaseModel):
     """Request para organização de lotes."""
 
     validated_files: List[str] = Field(
-        ..., description="Lista de caminhos de arquivos validados"
+        default_factory=list, description="Lista de caminhos (opcional se usando sessão)"
     )
     output_directory: str = Field(..., description="Diretório de saída para os lotes")
     max_docs_per_lot: int = Field(
@@ -99,17 +99,22 @@ class HealthResponse(BaseModel):
 # === Dependency Injection Helpers ===
 
 
+from app.infrastructure.database import db_manager
+
+
 def get_validation_service() -> ValidationService:
     """Factory para criar ValidationService com dependências."""
     manifest_repo = ManifestRepository()
     file_repo = FileRepository()
-    return ValidationService(manifest_repo=manifest_repo, file_repo=file_repo)
+    return ValidationService(
+        manifest_repo=manifest_repo, file_repo=file_repo, db_manager=db_manager
+    )
 
 
 def get_organization_service() -> OrganizationService:
     """Factory para criar OrganizationService com dependências."""
     file_manager = FileSystemManager()
-    return OrganizationService(file_manager=file_manager)
+    return OrganizationService(file_manager=file_manager, db_manager=db_manager)
 
 
 # === Endpoints ===
@@ -232,33 +237,33 @@ async def organize_lots(request: OrganizationRequest):
             },
         )
 
-        # TODO: Aqui precisaríamos reconstruir os DocumentFile objects
-        # Por enquanto, vou deixar um placeholder comentado
-        # Na prática, você pode querer armazenar o resultado da validação
-        # em cache/sessão e passar apenas os IDs aqui
+        # Reconstruir DocumentFile objects não é mais necessário aqui
+        # pois o service busca do banco de dados da sessão.
+        
+        service = get_organization_service()
+        
+        # Validar se diretório de saída existe ou criar
+        output_dir = Path(request.output_directory)
+        if not output_dir.exists():
+            # Tentar criar? O ideal é o usuario criar, mas podemos tentar
+             try:
+                 output_dir.mkdir(parents=True, exist_ok=True)
+             except Exception:
+                 pass # Service vai lidar ou dar erro
 
-        raise HTTPException(
-            status_code=status.HTTP_501_NOT_IMPLEMENTED,
-            detail="Organization endpoint not fully implemented yet. "
-            "Requires session management or file metadata storage.",
+        result = await service.organize_session_lots(
+            output_directory=output_dir,
+            max_docs_per_lot=request.max_docs_per_lot,
+            start_sequence_number=request.start_sequence_number,
+            lot_name_pattern=request.lot_name_pattern,
         )
 
-        # Código comentado para referência futura:
-        # service = get_organization_service()
-        # result = await service.organize_and_generate_lots(
-        #     validated_files=validated_files,
-        #     output_directory=Path(request.output_directory),
-        #     max_docs_per_lot=request.max_docs_per_lot,
-        #     start_sequence_number=request.start_sequence_number,
-        #     lot_name_pattern=request.lot_name_pattern,
-        # )
-        #
-        # return OrganizationResponse(
-        #     success=result.success,
-        #     message=result.message,
-        #     lots_created=result.lots_created,
-        #     files_moved=result.files_moved,
-        # )
+        return OrganizationResponse(
+            success=result.success,
+            message=result.message,
+            lots_created=result.lots_created,
+            files_moved=result.files_moved,
+        )
 
     except HTTPException:
         raise

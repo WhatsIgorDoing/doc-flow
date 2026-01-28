@@ -11,8 +11,9 @@ from sqlalchemy.pool import StaticPool
 
 from app.core.config import settings
 from app.core.logger import app_logger
-from app.domain.models import Event, Session as AppSession, SystemInfo
+from app.domain.models import Event, Session as AppSession, SystemInfo, ValidatedDocument
 from app.core.constants import EventType, SyncStatus
+from app.domain.entities import DocumentFile
 
 
 class DatabaseManager:
@@ -67,7 +68,17 @@ class DatabaseManager:
             db.refresh(session)
         
         app_logger.info("Session created", extra={"session_id": session_id})
+        self.current_session_id = session_id
         return session
+
+    @property
+    def session_id(self) -> str:
+        """Retorna o ID da sessão atual ou gera um erro/novo se não existir."""
+        if not hasattr(self, 'current_session_id') or not self.current_session_id:
+            # Em caso de uso fora do lifecycle normal (ex: testes), retorna um dummy ou erro
+            # Para segurança, vamos retornar None e deixar quem chama tratar
+            return "unknown_session"
+        return self.current_session_id
     
     def log_event(self, session_id: str, device_id: str, event_type: EventType,
                   duration_ms: Optional[int] = None, files_processed: Optional[int] = None,
@@ -189,12 +200,89 @@ class DatabaseManager:
             db.add(info)
             db.commit()
     
-    def get_system_info(self, key: str) -> Optional[str]:
-        """Recupera informação do sistema."""
-        with Session(self.engine) as db:
-            statement = select(SystemInfo).where(SystemInfo.key == key)
             info = db.exec(statement).first()
             return info.value if info else None
+
+    def save_validated_documents(self, session_id: str, documents: List[DocumentFile]) -> int:
+        """
+        Salva uma lista de documentos validados.
+        
+        Args:
+            session_id: ID da sessão atual
+            documents: Lista de DocumentFile validados
+            
+        Returns:
+            Quantidade de documentos salvos
+        """
+        if not documents:
+            return 0
+            
+        # Primeiro limpa validações anteriores desta sessão para evitar duplicatas/confusão
+        self.clear_validated_documents(session_id)
+        
+        validated_docs = []
+        for doc in documents:
+            # Extrai metadados se houver manifesto associado
+            doc_code = None
+            revision = None
+            title = None
+            
+            if doc.associated_manifest_item:
+                doc_code = doc.associated_manifest_item.document_code
+                revision = doc.associated_manifest_item.revision
+                title = doc.associated_manifest_item.title
+                
+            validated_doc = ValidatedDocument(
+                session_id=session_id,
+                path=str(doc.path),
+                filename=doc.path.name,
+                size_bytes=doc.size_bytes,
+                status=doc.status.value, # Enum value str
+                document_code=doc_code,
+                revision=revision,
+                title=title
+            )
+            validated_docs.append(validated_doc)
+            
+        with Session(self.engine) as db:
+            for v_doc in validated_docs:
+                db.add(v_doc)
+            db.commit()
+            
+        app_logger.info(f"Saved {len(validated_docs)} validated documents", extra={"session_id": session_id})
+        return len(validated_docs)
+
+    def get_validated_documents(self, session_id: str) -> List[ValidatedDocument]:
+        """
+        Recupera documentos validados da sessão.
+        
+        Args:
+            session_id: ID da sessão
+            
+        Returns:
+            Lista de ValidatedDocument
+        """
+        with Session(self.engine) as db:
+            statement = select(ValidatedDocument).where(
+                ValidatedDocument.session_id == session_id
+            )
+            return list(db.exec(statement).all())
+
+    def clear_validated_documents(self, session_id: str) -> None:
+        """
+        Limpa documentos validados anteriores da sessão.
+        
+        Args:
+            session_id: ID da sessão
+        """
+        with Session(self.engine) as db:
+            statement = select(ValidatedDocument).where(
+                ValidatedDocument.session_id == session_id
+            )
+            results = db.exec(statement).all()
+            for res in results:
+                db.delete(res)
+            db.commit()
 
 
 # Singleton global
