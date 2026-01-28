@@ -5,10 +5,6 @@ Script para criar fixtures de teste ausentes para o SAD_APP v2.0
 import openpyxl
 from pathlib import Path
 from docx import Document
-from PyPDF2 import PdfWriter, PdfReader
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
-import io
 
 
 def create_manifesto_exemplo():
