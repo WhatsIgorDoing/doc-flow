@@ -13,7 +13,7 @@ class FilePickerMolecule(ui.column):
         self.is_folder = is_folder
         
         # Container styles
-        self.classes("w-full border-2 border-dashed border-gray-300 rounded-xl p-8 items-center justify-center gap-4 transition-all duration-300")
+        self.classes("w-full border-2 border-dashed border-gray-300 rounded-xl p-8 items-center justify-center gap-6 transition-all duration-300")
         self.classes("hover:border-blue-400 hover:bg-blue-50/50")
         self.style("min-height: 160px; cursor: pointer")
         

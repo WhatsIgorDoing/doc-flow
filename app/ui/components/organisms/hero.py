@@ -10,7 +10,7 @@ def HeroHeader():
     with ui.row().classes("w-full items-center justify-between mb-8"):
         
         # Left: Title & Context
-        with ui.column().classes("gap-1"):
+        with ui.column().classes("gap-2"):
             with ui.row().classes("items-center gap-3"):
                 ui.icon("verified", size="md", color="primary")
                 ui.label("Validação de Documentos").classes(design.typo.h2 + " text-gray-900")

@@ -25,7 +25,7 @@ class ResultsList(GlassCard):
              ui.separator().classes("mb-4 opacity-50")
              
              # List container
-             self.list_container = ui.column().classes("w-full gap-2")
+             self.list_container = ui.column().classes("w-full gap-3")
 
     def stat_card(self, label, value, color_class):
          with ui.column().classes(f"p-4 rounded-xl items-center justify-center {color_class}"):

@@ -11,7 +11,7 @@ class StatusPill(ui.element):
         
         self.classes("inline-flex items-center gap-2 px-3 py-1 rounded-full border text-xs font-semibold tracking-wide transition-colors duration-300")
         
-        self.dot = ui.html('<span class="relative flex h-2 w-2 mr-1"></span>', sanitize=False)
+        self.dot = ui.html('<span class="relative flex h-2 w-2 mr-1"></span>')
         self.label = ui.label()
         
         self.update_status(status)
