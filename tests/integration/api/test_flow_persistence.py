@@ -42,7 +42,8 @@ def test_db_manager(tmp_path):
 def test_full_flow_validate_then_organize(
     mock_get_org_service, 
     mock_get_valid_service, 
-    test_db_manager
+    test_db_manager,
+    tmp_path
 ):
     # NOTA: Em vez de mockar os services inteiros, vamos usar os services REAIS
     # mas mockar os repositórios DELES (IO).
@@ -96,11 +97,17 @@ def test_full_flow_validate_then_organize(
 
     # === EXECUÇÃO ===
     
+    # Create dummy paths
+    d_manifest = tmp_path / "manifest.xlsx"
+    d_manifest.touch()
+    d_source = tmp_path / "docs"
+    d_source.mkdir()
+
     # Passo 1: Validate Endpoint
     print("\n[TEST] Calling /api/validate")
     resp_val = client.post("/api/validate", json={
-        "manifest_path": "c:/d/m.xlsx",
-        "source_directory": "c:/d/docs"
+        "manifest_path": str(d_manifest),
+        "source_directory": str(d_source)
     })
     assert resp_val.status_code == 200
     
