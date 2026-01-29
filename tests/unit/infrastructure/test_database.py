@@ -15,25 +15,18 @@ def db_manager(tmp_path):
     # ou monkeypatch settings.
     
     from app.core.config import settings
-    original_db_name = settings.DATABASE_NAME
     
     # Use um arquivo unico no tmp_path para evitar conflitos
     test_db = tmp_path / "test_docflow.db"
-    settings.DATABASE_NAME = str(test_db.name)
-    # settings.APP_DATA_DIR = str(tmp_path) # Cuidado com efeitos colaterais
     
     # Importante: DatabaseManager é singleton. Precisamos reinicializar ou usar uma instancia nova
     # Mas o codigo usa o singleton global importado.
     
-    # Vamos instanciar um NOVO DatabaseManager apontando para o banco de teste
-    # E monkeypatchar o global db_manager onde ele é usado? Não, unit test devia testar a classe.
-    
-    # Melhor refatorar DatabaseManager para aceitar url no init?
-    # Ele pega de settings.get_database_path().
-    
-    # Hack: Patch get_database_path do settings object
+    # Hack: Patch DATABASE_PATH do settings object
+    # Pydantic models intercept setattr, so monkeypatching methods can be tricky.
+    # Patching the field is safer.
     with pytest.MonkeyPatch.context() as m:
-        m.setattr(settings, "get_database_path", lambda: test_db)
+        m.setattr(settings, "DATABASE_PATH", str(test_db))
         
         manager = DatabaseManager() 
         manager.init_db()
