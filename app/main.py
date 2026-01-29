@@ -16,7 +16,7 @@ from app.core.device_id import device_manager
 from app.core.constants import EventType
 from app.infrastructure.database import db_manager
 from app.workers.sync_worker import sync_worker
-from app.workers.sync_worker import sync_worker
+
 from app.ui.pages.dashboard import ValidationDashboard
 from app.api.endpoints import router as api_router
 
@@ -37,8 +37,8 @@ def run():
     """Executa a aplicação."""
     ui.run(
         title=settings.APP_NAME,
-        native=True,  # Modo desktop (janela nativa)
-        window_size=(1024, 768),
+        native=False,  # Modo browser (bypass pywebview issue)
+        # window_size=(1024, 768), # Removed for browser mode
         reload=False,
         show=True,
         port=8080,
