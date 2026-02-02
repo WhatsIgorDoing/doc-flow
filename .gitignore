@@ -76,5 +76,3 @@ secrets/
 data/
 *.db
 .device_id
-
-.agent/
