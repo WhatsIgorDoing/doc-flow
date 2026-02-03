@@ -5,14 +5,16 @@ import type { ValidatedDocument } from '@/types/database';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { BatchSelector } from '@/components/documents/batch-selector';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 interface DocumentsTableProps {
     documents: ValidatedDocument[];
+    contractId: string;
 }
 
-export function DocumentsTable({ documents }: DocumentsTableProps) {
+export function DocumentsTable({ documents, contractId }: DocumentsTableProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState<string>('ALL');
 
@@ -52,14 +54,14 @@ export function DocumentsTable({ documents }: DocumentsTableProps) {
             </div>
 
             {/* Table */}
-            <div className="rounded-md border">
+            <div className="rounded-md border overflow-x-auto">
                 <table className="w-full">
                     <thead className="bg-muted/50">
                         <tr className="border-b">
                             <th className="text-left p-4 font-medium">Arquivo</th>
                             <th className="text-left p-4 font-medium">Status</th>
-                            <th className="text-left p-4 font-medium">Código do Documento</th>
                             <th className="text-left p-4 font-medium">Lote</th>
+                            <th className="text-left p-4 font-medium">Código do Documento</th>
                             <th className="text-left p-4 font-medium">Data de Validação</th>
                         </tr>
                     </thead>
@@ -87,16 +89,18 @@ export function DocumentsTable({ documents }: DocumentsTableProps) {
                                         <StatusBadge status={doc.status} />
                                     </td>
                                     <td className="p-4">
+                                        <BatchSelector
+                                            documentId={doc.id}
+                                            contractId={contractId}
+                                            currentBatchId={doc.batch_id}
+                                        />
+                                    </td>
+                                    <td className="p-4">
                                         {doc.manifest_item_id ? (
                                             <span className="font-mono text-sm">
                                                 {(doc as any).manifest_item?.document_code || '-'}
                                             </span>
                                         ) : (
-                                            <span className="text-muted-foreground">-</span>
-                                        )}
-                                    </td>
-                                    <td className="p-4">
-                                        {doc.lot_number || (
                                             <span className="text-muted-foreground">-</span>
                                         )}
                                     </td>
