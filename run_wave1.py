@@ -12,6 +12,6 @@ sys.path.insert(0, str(root_dir))
 
 # Importa e executa o main da Wave 1
 if __name__ == "__main__":
-    from app.main_wave1 import main
+    from app.main import run
 
-    main()
+    run()

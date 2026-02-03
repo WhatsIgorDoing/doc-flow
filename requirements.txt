@@ -1,0 +1,16 @@
+nicegui
+fastapi
+sqlmodel
+python-dotenv
+uvicorn
+aiofiles
+openpyxl
+pytest
+pytest-asyncio
+httpx
+pydantic
+pydantic-settings
+sqlalchemy
+greenlet
+psutil
+pywebview>=5.0.0

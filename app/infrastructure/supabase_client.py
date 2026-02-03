@@ -3,7 +3,12 @@ Cliente Supabase para sincronização de telemetria.
 """
 
 from typing import List, Dict, Any, Optional
-from supabase import create_client, Client
+try:
+    from supabase import create_client, Client
+except ImportError:
+    create_client = None
+    Client = object
+    print("Supabase library not found. Sync features will fail if used.")
 
 from app.core.config import settings
 from app.core.logger import app_logger
