@@ -13,9 +13,9 @@ Esta pasta contém todos os brainstorms realizados durante o projeto Doc Flow. C
 
 ## 🗂️ Índice de Brainstorms
 
-| Data       | ID   | Tema                                                                  | Status         |
-| ---------- | ---- | --------------------------------------------------------------------- | -------------- |
-| 2026-02-03 | #001 | [Separação Arquitetural: DCS vs DV](./001-architecture-separation.md) | 🟡 Em Discussão |
+| Data       | ID   | Tema                                                                  | Status      |
+| ---------- | ---- | --------------------------------------------------------------------- | ----------- |
+| 2026-02-03 | #001 | [Separação Arquitetural: DCS vs DV](./001-architecture-separation.md) | ✅ Concluído |
 
 ---
 

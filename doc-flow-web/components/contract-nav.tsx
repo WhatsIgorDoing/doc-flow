@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FileText, List, FolderOpen, BarChart3 } from 'lucide-react';
+import { FileText, List, FolderOpen, BarChart3, Upload, HelpCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ContractNavProps {
@@ -19,6 +19,16 @@ const navItems = [
         href: (id: string) => `/contracts/${id}/manifest`,
         label: 'Manifesto',
         icon: List,
+    },
+    {
+        href: (id: string) => `/contracts/${id}/validation`,
+        label: 'Validação',
+        icon: Upload,
+    },
+    {
+        href: (id: string) => `/contracts/${id}/resolution`,
+        label: 'Resolução',
+        icon: HelpCircle,
     },
     {
         href: (id: string) => `/contracts/${id}/batches`,

@@ -10,7 +10,7 @@ const validationResultSchema = z.object({
     status: z.enum(['valid', 'invalid', 'pending']),
     validation_errors: z.array(z.string()).optional(),
     validated_at: z.string().datetime().optional(),
-    metadata: z.record(z.unknown()).optional(),
+    metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 const batchValidationSchema = z.object({

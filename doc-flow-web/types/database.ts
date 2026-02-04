@@ -3,7 +3,7 @@
  * Generated from Phase 1 migration plan.
  */
 
-export type DocumentStatus = 'VALIDATED' | 'UNRECOGNIZED' | 'ERROR' | 'PENDING';
+export type DocumentStatus = 'VALIDATED' | 'UNRECOGNIZED' | 'ERROR' | 'PENDING' | 'NEEDS_SUFFIX';
 
 export type UserRole =
     | 'super_admin'
@@ -102,6 +102,8 @@ export interface ValidatedDocument {
     batch_id: string | null;
     error_message: string | null;
     error_details: Record<string, any> | null;
+    confidence?: number;
+    matched_document_code?: string;
     created_at: string;
     updated_at: string;
 }

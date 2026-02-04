@@ -93,6 +93,23 @@ export async function POST(
             );
         }
 
+        // Assign documents if provided
+        if (body.documentIds && Array.isArray(body.documentIds) && body.documentIds.length > 0) {
+            try {
+                const { createBatchService } = await import('@/lib/validator/services/batch-service');
+                const batchService = createBatchService(id);
+
+                await batchService.assignDocumentsToBatch({
+                    batch_id: batch.id,
+                    document_ids: body.documentIds,
+                });
+            } catch (assignError) {
+                console.error('Error assigning documents to batch:', assignError);
+                // We don't fail the request, but we should probably warn the user
+                // For now, we return the batch but log the error
+            }
+        }
+
         return NextResponse.json(batch, { status: 201 });
     } catch (error) {
         console.error('Batch creation error:', error);

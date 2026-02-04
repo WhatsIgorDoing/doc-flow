@@ -2,8 +2,9 @@
 
 **Data:** 2026-02-03  
 **Participantes:** AI (Orchestrator) + Igor Bueno  
-**Status:** 🟡 Em Discussão  
-**Relacionado:** [docs/analysis](../analysis/), [gap_analysis.md](../analysis/gap_analysis.md)
+**Status:** ✅ Concluído  
+**Relacionado:** [docs/analysis](../analysis/), [gap_analysis.md](../analysis/gap_analysis.md)  
+**ADR:** [ADR-001](../adr/001-dcs-dv-separation.md) | **PLAN:** [PLAN.md](../PLAN.md)
 
 ---
 
@@ -76,8 +77,8 @@ Como devemos implementar a separação entre DCS e DV?
 [Aguardando decisão]
 ```
 
-**Decisão Final:** _[A ser preenchido]_  
-**Justificativa:** _[A ser preenchido]_
+**Decisão Final:** _[Opção C: Híbrido]_  
+**Justificativa:** _[Como se trata de um sistema com desenvolvimento solo, a opção C se torna mais viável visto que o produto pode escalar de forma mais segura]_
 
 ---
 
@@ -125,8 +126,8 @@ eventBus.on('manifest.updated', (event) => {
 [Aguardando decisão]
 ```
 
-**Decisão Final:** _[A ser preenchido]_  
-**Justificativa:** _[A ser preenchido]_
+**Decisão Final:** _[Opção C: Event-Driven (Pub/Sub)]_  
+**Justificativa:** _[como trabalharemos com um sistema com diversos módulos acredito que faça-se necessário deixar toda a estrutra desacoplada para ]_
 
 ---
 
@@ -182,7 +183,7 @@ Vamos mapear **exatamente** o que cada sistema faz:
 [Aguardando decisão]
 ```
 
-**Ajustes Necessários:** _[A ser preenchido]_
+**Ajustes Necessários:** _[a responsabilidade de gerar, e organizar os lotes/batches é de responsabiilidade do DV, também não hávera armazenamento de documentos por parte do DCS e DV o DV apenas armazena o nº da GRDT gerada e quais itens estão com este número da GRDT e transfere para uma coluna do DCS ]_
 
 ---
 
@@ -232,7 +233,7 @@ A tabela `validated_documents` deve pertencer a qual sistema?
 [Aguardando decisão]
 ```
 
-**Decisão Final:** _[A ser preenchido]_  
+**Decisão Final:** _[Para tomar essa decisão preciso compreender melhor o que é essas entidades, no geral ela atende como na discução anterior DV apenas armazena o nº da GRDT gerada e quais itens estão com este número da GRDT e transfere para uma coluna do DCS as demais informações criadas pelo DCS são dele propriamente]_  
 **Modelo de Ownership:** _[A ser preenchido]_
 
 ---
@@ -296,9 +297,7 @@ Fase 3 (Export): Ação final no DCS
 [Aguardando decisão]
 ```
 
-**Decisão Final:** _[A ser preenchido]_  
-**Wireframe/Fluxo:** _[A ser descrito ou linkado]_
-
+**Decisão Final:** _[Opção C: Híbrido (Wizard + Tabs)]_  
 ---
 
 ### 6️⃣ Impacto no Roadmap
@@ -371,8 +370,7 @@ Sprints 1-4: Implementar features JÁ respeitando a separação
 [Aguardando decisão]
 ```
 
-**Decisão Final:** _[A ser preenchido]_  
-**Roadmap Ajustado:** _[A ser definido]_
+**Decisão Final:** _[Opção C: Híbrido (Planejamento + Execução)]_  
 
 ---
 

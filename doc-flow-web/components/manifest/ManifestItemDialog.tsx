@@ -19,6 +19,7 @@ import { manifestItemSchema, type ManifestItemInput } from '@/lib/schemas/manife
 
 interface ManifestItem {
     id: string;
+    numbering?: string;
     document_code: string;
     revision: string | null;
     title: string | null;
@@ -65,6 +66,32 @@ async function updateManifestItem(contractId: string, itemId: string, data: Part
     return res.json();
 }
 
+// Helper function to convert null values to empty strings for form defaults
+function getDefaultValues(item?: ManifestItem): ManifestItemInput {
+    if (!item) {
+        return {
+            numbering: '',
+            document_code: '',
+            revision: '',
+            title: '',
+            document_type: '',
+            category: '',
+            expected_delivery_date: '',
+            responsible_email: '',
+        };
+    }
+    return {
+        numbering: item.numbering || '',
+        document_code: item.document_code,
+        revision: item.revision ?? '',
+        title: item.title ?? '',
+        document_type: item.document_type ?? '',
+        category: item.category ?? '',
+        expected_delivery_date: item.expected_delivery_date ?? '',
+        responsible_email: item.responsible_email ?? '',
+    };
+}
+
 export function ManifestItemDialog({
     contractId,
     item,
@@ -80,16 +107,7 @@ export function ManifestItemDialog({
         formState: { errors },
     } = useForm<ManifestItemInput>({
         resolver: zodResolver(manifestItemSchema),
-        defaultValues: item || {
-            numbering: '',
-            document_code: '',
-            revision: '',
-            title: '',
-            document_type: '',
-            category: '',
-            expected_delivery_date: '',
-            responsible_email: '',
-        }
+        defaultValues: getDefaultValues(item),
     });
 
     const mutation = useMutation({

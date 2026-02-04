@@ -25,9 +25,10 @@ interface BatchDialogProps {
     batch: any | null;
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    selectedDocumentIds?: string[]; // New prop
 }
 
-export function BatchDialog({ contractId, batch, open, onOpenChange }: BatchDialogProps) {
+export function BatchDialog({ contractId, batch, open, onOpenChange, selectedDocumentIds = [] }: BatchDialogProps) {
     const queryClient = useQueryClient();
     const isEditing = !!batch;
 
@@ -50,11 +51,11 @@ export function BatchDialog({ contractId, batch, open, onOpenChange }: BatchDial
         } else {
             reset({
                 name: '',
-                description: '',
+                description: selectedDocumentIds.length > 0 ? `Lote com ${selectedDocumentIds.length} documentos` : '',
                 validated_at: new Date().toISOString().split('T')[0],
             });
         }
-    }, [batch, reset]);
+    }, [batch, reset, selectedDocumentIds, open]); // Added open to refresh when dialog opens
 
     const mutation = useMutation({
         mutationFn: async (data: BatchFormData) => {
@@ -70,6 +71,7 @@ export function BatchDialog({ contractId, batch, open, onOpenChange }: BatchDial
                 body: JSON.stringify({
                     ...data,
                     validated_at: data.validated_at ? new Date(data.validated_at).toISOString() : undefined,
+                    documentIds: !isEditing ? selectedDocumentIds : undefined, // Only send on create
                 }),
             });
 
@@ -78,7 +80,8 @@ export function BatchDialog({ contractId, batch, open, onOpenChange }: BatchDial
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['batches', contractId] });
-            toast.success(isEditing ? 'Lote atualizado!' : 'Lote criado!');
+            queryClient.invalidateQueries({ queryKey: ['unassigned-docs', contractId] }); // Refresh unassigned list
+            toast.success(isEditing ? 'Lote atualizado!' : 'Lote criado com sucesso!');
             onOpenChange(false);
             reset();
         },
@@ -97,6 +100,12 @@ export function BatchDialog({ contractId, batch, open, onOpenChange }: BatchDial
                 <DialogHeader>
                     <DialogTitle>{isEditing ? 'Editar Lote' : 'Novo Lote'}</DialogTitle>
                 </DialogHeader>
+
+                {!isEditing && selectedDocumentIds.length > 0 && (
+                    <div className="bg-blue-50 p-3 rounded-md text-sm text-blue-700 mb-2">
+                        Criando lote com <strong>{selectedDocumentIds.length}</strong> documentos selecionados.
+                    </div>
+                )}
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                     <div>

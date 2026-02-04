@@ -30,6 +30,11 @@ const statusConfig: Record<
         variant: 'secondary',
         icon: '○',
     },
+    NEEDS_SUFFIX: {
+        label: 'Ajuste Necessário',
+        variant: 'warning',
+        icon: '✎',
+    },
 };
 
 export function StatusBadge({ status, size = 'md' }: StatusBadgeProps) {
