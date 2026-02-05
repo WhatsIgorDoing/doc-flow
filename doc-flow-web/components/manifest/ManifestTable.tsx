@@ -13,7 +13,15 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Pencil, Trash2, Search, FileSpreadsheet } from 'lucide-react';
+import { Pencil, Trash2, Search, FileSpreadsheet, Download } from 'lucide-react';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { ManifestItemDialog } from './ManifestItemDialog';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 import { ExcelImportSheet } from './ExcelImportSheet';
@@ -58,6 +66,7 @@ interface ManifestTableProps {
     contractId: string;
 }
 
+// ... fetchManifest stays same ...
 async function fetchManifest(contractId: string, page: number, search: string) {
     const url = new URL(`/api/contracts/${contractId}/manifest`, window.location.origin);
     url.searchParams.set('page', page.toString());
@@ -85,6 +94,11 @@ export function ManifestTable({ contractId }: ManifestTableProps) {
     const handleImportComplete = () => {
         queryClient.invalidateQueries({ queryKey: ['manifest'] });
         setIsImportOpen(false);
+    };
+
+    const handleExport = (discipline: string) => {
+        const url = `/api/contracts/${contractId}/manifest/export?discipline=${discipline}`;
+        window.open(url, '_blank');
     };
 
     if (isLoading) {
@@ -118,10 +132,34 @@ export function ManifestTable({ contractId }: ManifestTableProps) {
                         className="pl-9"
                     />
                 </div>
-                <Button variant="outline" onClick={() => setIsImportOpen(true)} className="gap-2">
-                    <FileSpreadsheet className="h-4 w-4 text-green-600" />
-                    Importar Excel
-                </Button>
+                <div className="flex gap-2">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" className="gap-2">
+                                <Download className="h-4 w-4" />
+                                Exportar
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Selecione o Modelo</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem onClick={() => handleExport('quality')}>
+                                Qualidade (.xlsx)
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleExport('commissioning')}>
+                                Comissionamento (.xlsx)
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleExport('cv')}>
+                                Currículos (.xlsx)
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+
+                    <Button variant="outline" onClick={() => setIsImportOpen(true)} className="gap-2 bg-green-50 text-green-700 border-green-200 hover:bg-green-100 hover:text-green-800">
+                        <FileSpreadsheet className="h-4 w-4" />
+                        Importar Excel
+                    </Button>
+                </div>
             </div>
 
             {/* Table Container with Horizontal Scroll */}

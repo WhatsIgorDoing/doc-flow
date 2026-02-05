@@ -30,60 +30,68 @@ export async function POST(
         const workbook = new ExcelJS.Workbook();
         await workbook.xlsx.load(buffer);
 
-        const sheet = workbook.getWorksheet(template.sheetName);
-        if (!sheet) {
-            return NextResponse.json({ error: `Aba "${template.sheetName}" não encontrada.` }, { status: 400 });
-        }
-
         const itemsToInsert: any[] = [];
 
-        sheet.eachRow((row, rowNumber) => {
-            if (rowNumber < template.startRow) return;
+        workbook.eachSheet((sheet, sheetId) => {
+            // Processing logic - similar to preview
+            sheet.eachRow((row, rowNumber) => {
+                if (rowNumber < template.startRow) return;
 
-            const rowData: Record<string, any> = {
-                contract_id: contractId,
-                discipline: discipline,
-                original_sheet_name: template.sheetName,
-                // Defaults
-                status: 'PENDING',
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
-            };
+                const rowData: Record<string, any> = {
+                    contract_id: contractId,
+                    discipline: discipline,
+                    original_sheet_name: sheet.name, // Save exact source sheet
+                    // Defaults
+                    status: 'PENDING',
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                };
 
-            let hasData = false;
-            Object.entries(template.columns).forEach(([colLetter, field]) => {
-                const cell = row.getCell(colLetter);
-                const val = cleanValue(cell.value);
-                if (val) {
-                    hasData = true;
-                    rowData[field] = val;
+                let hasData = false;
+                Object.entries(template.columns).forEach(([colLetter, field]) => {
+                    const cell = row.getCell(colLetter);
+                    const val = cleanValue(cell.value);
+                    if (val) {
+                        hasData = true;
+                        rowData[field] = val;
+                    }
+                });
+
+                if (hasData && rowData['document_code']) {
+                    itemsToInsert.push(rowData);
                 }
             });
-
-            if (hasData && rowData['document_code']) {
-                itemsToInsert.push(rowData);
-            }
         });
 
         if (itemsToInsert.length === 0) {
             return NextResponse.json({ count: 0 });
         }
 
-        // Insert into Supabase
-        // Note: Supabase insert returns the inserted rows or error.
-        const { error } = await supabase
-            .from('manifest_items')
-            .upsert(itemsToInsert, {
-                onConflict: 'document_code', // Assumption: Update if exists, or ignore?
-                ignoreDuplicates: true       // Plan said "Skip existing".
-            });
+        // Insert into Supabase in batches of 1000 to avoid timeouts/limits
+        const BATCH_SIZE = 1000;
+        let insertedCount = 0;
 
-        if (error) {
-            console.error('Supabase Insert Error:', error);
-            return NextResponse.json({ error: 'Erro ao salvar no banco de dados' }, { status: 500 });
+        for (let i = 0; i < itemsToInsert.length; i += BATCH_SIZE) {
+            const batch = itemsToInsert.slice(i, i + BATCH_SIZE);
+            const { error } = await supabase
+                .from('manifest_items')
+                .upsert(batch, {
+                    onConflict: 'document_code',
+                    ignoreDuplicates: true
+                });
+
+            if (error) {
+                console.error(`Supabase Insert Error (Batch ${i} - ${i + BATCH_SIZE}):`, error);
+                // Return error immediately or continue? 
+                // For data integrity, stopping is safer than partial imports with unknown gaps.
+                return NextResponse.json({
+                    error: `Erro ao salvar lote ${Math.floor(i / BATCH_SIZE) + 1}. Verifique logs.`
+                }, { status: 500 });
+            }
+            insertedCount += batch.length;
         }
 
-        return NextResponse.json({ count: itemsToInsert.length });
+        return NextResponse.json({ count: insertedCount });
 
     } catch (error) {
         console.error('Excel Import Error:', error);

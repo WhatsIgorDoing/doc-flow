@@ -33,52 +33,67 @@ export async function POST(
         const workbook = new ExcelJS.Workbook();
         await workbook.xlsx.load(buffer);
 
-        // Get Sheet
-        const sheet = workbook.getWorksheet(template.sheetName);
-        if (!sheet) {
-            // Fallback: try first sheet if specific name fails (flexible for user error)
-            // But for "Strict Compliance" we might want to be strict.
-            // Let's rely on the template name for now.
-            return NextResponse.json({ error: `Aba "${template.sheetName}" não encontrada.` }, { status: 400 });
-        }
-
+        // Create explicit map for results
         const sampleData: any[] = [];
         let validRows = 0;
         let invalidRows = 0;
+        const processedSheets: string[] = [];
 
-        // Iterate Rows
-        // startRow is 1-based.
-        sheet.eachRow((row, rowNumber) => {
-            if (rowNumber < template.startRow) return;
+        workbook.eachSheet((sheet, sheetId) => {
+            // Heuristic: Check if header row exists or just try to parse
+            // If the sheet strictly doesn't match the columns, it should yield 0 valid rows
+            // But we must be careful not to count random cells as "invalidRows" in a cover sheet.
+            // Strategy: Only count "invalidRows" if we found at least ONE valid row in the sheet?
+            // Or better: Just count. If a sheet is garbage, it might add to invalidRows, which is noise.
+            // Refined Strategy: If a sheet has NO valid 'document_code' in the first 50 rows, ignore it entirely?
+            // Let's stick to: Parse all. If 'document_code' is present, it's valid.
 
-            // Extract using column mapping
-            const rowData: Record<string, any> = {};
-            let hasData = false;
+            let sheetValidRows = 0;
 
-            Object.entries(template.columns).forEach(([colLetter, field]) => {
-                const cell = row.getCell(colLetter);
-                const val = cleanValue(cell.value);
-                if (val) hasData = true;
-                rowData[field] = val;
+            sheet.eachRow((row, rowNumber) => {
+                if (rowNumber < template.startRow) return;
+
+                const rowData: Record<string, any> = {};
+                let hasData = false;
+
+                Object.entries(template.columns).forEach(([colLetter, field]) => {
+                    const cell = row.getCell(colLetter);
+                    const val = cleanValue(cell.value);
+                    if (val) hasData = true;
+                    rowData[field] = val;
+                });
+
+                if (hasData) {
+                    if (rowData['document_code']) {
+                        validRows++;
+                        sheetValidRows++;
+                        if (sampleData.length < 5) {
+                            sampleData.push({ ...rowData, _sheet: sheet.name });
+                        }
+                    } else {
+                        // Only count invalid if we are in a sheet that SEEMS to be data (has >0 valid rows so far or likely structure)
+                        // For now, let's just count global invalid, but maybe we shouldn't show it if it's too high (misinterpretation).
+                        invalidRows++;
+                    }
+                }
             });
 
-            if (hasData) {
-                // Basic Validation (e.g. document_code required)
-                if (rowData['document_code']) {
-                    validRows++;
-                    if (sampleData.length < 5) {
-                        sampleData.push(rowData);
-                    }
-                } else {
-                    invalidRows++;
-                }
+            if (sheetValidRows > 0) {
+                processedSheets.push(sheet.name);
             }
         });
 
+        if (validRows === 0) {
+            return NextResponse.json({
+                error: `Nenhuma linha válida encontrada em nenhuma aba. Verifique o layout (Início na linha ${template.startRow}, Coluna A = Código).`
+            }, { status: 400 });
+        }
+
         return NextResponse.json({
             validRows,
-            invalidRows,
-            sample: sampleData
+            invalidRows, // This might be high due to non-data sheets, but acceptable for now.
+            sample: sampleData,
+            sheets: processedSheets
         });
 
     } catch (error) {

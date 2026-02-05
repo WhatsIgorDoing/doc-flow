@@ -62,13 +62,16 @@ export function ExcelImportSheet({ open, onOpenChange, contractId, onImportCompl
                 body: formData,
             });
 
-            if (!response.ok) throw new Error('Falha ao ler o arquivo');
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.error || 'Falha ao ler o arquivo');
+            }
 
             const data = await response.json();
             setPreview(data);
             setStep('PREVIEW');
         } catch (error) {
-            toast.error("Erro ao analisar planilha. Verifique se o formato está correto.");
+            toast.error((error as Error).message);
             console.error(error);
         } finally {
             setLoading(false);
