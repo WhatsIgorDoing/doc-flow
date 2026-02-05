@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { UploadCloud, FileSpreadsheet, Loader2, CheckCircle, AlertCircle, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
+import ExcelJS from 'exceljs';
 
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -33,12 +34,20 @@ interface PreviewData {
     sample: any[];
 }
 
+interface ImportError {
+    _sheet: string;
+    _row: number;
+    _reason: string;
+    [key: string]: any;
+}
+
 export function ExcelImportSheet({ open, onOpenChange, contractId, onImportComplete }: ExcelImportSheetProps) {
     const [step, setStep] = useState<ImportStep>('SELECT');
     const [discipline, setDiscipline] = useState<Discipline | ''>('');
     const [file, setFile] = useState<File | null>(null);
     const [preview, setPreview] = useState<PreviewData | null>(null);
     const [loading, setLoading] = useState(false);
+    const [importErrors, setImportErrors] = useState<ImportError[]>([]);
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'] },
@@ -82,6 +91,7 @@ export function ExcelImportSheet({ open, onOpenChange, contractId, onImportCompl
         if (!file || !discipline) return;
         setLoading(true);
         setStep('IMPORTING');
+        setImportErrors([]);
 
         const formData = new FormData();
         formData.append('file', file);
@@ -93,18 +103,58 @@ export function ExcelImportSheet({ open, onOpenChange, contractId, onImportCompl
                 body: formData,
             });
 
-            if (!response.ok) throw new Error('Importação falhou');
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.error || 'Importação falhou');
+            }
 
             const result = await response.json();
-            toast.success(`${result.count} documentos importados com sucesso!`);
+
+            if (result.errors && result.errors.length > 0) {
+                setImportErrors(result.errors);
+                toast.warning(`Importação concluída com avisos: ${result.count} sucessos, ${result.errors.length} falhas.`);
+            } else {
+                toast.success(`${result.count} documentos importados com sucesso!`);
+            }
+
             setStep('SUCCESS');
             onImportComplete();
         } catch (error) {
-            toast.error("Erro ao importar dados.");
-            setStep('PREVIEW'); // Go back to preview on error
+            toast.error((error as Error).message);
+            setStep('PREVIEW');
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleDownloadErrors = async () => {
+        if (importErrors.length === 0) return;
+
+        const workbook = new ExcelJS.Workbook();
+        const sheet = workbook.addWorksheet('Erros de Importação');
+
+        if (importErrors.length > 0) {
+            const keys = Object.keys(importErrors[0]).filter(k => k !== '_sheet' && k !== '_row' && k !== '_reason');
+            sheet.columns = [
+                { header: 'MOTIVO DO ERRO', key: '_reason', width: 40 },
+                { header: 'Aba Original', key: '_sheet', width: 20 },
+                { header: 'Linha Original', key: '_row', width: 15 },
+                ...keys.map(k => ({ header: k, key: k, width: 20 }))
+            ];
+        }
+
+        importErrors.forEach(err => {
+            sheet.addRow(err);
+        });
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `erros_importacao_${new Date().toISOString().split('T')[0]}.xlsx`;
+        a.click();
+        window.URL.revokeObjectURL(url);
     };
 
     const resetState = () => {
@@ -112,6 +162,7 @@ export function ExcelImportSheet({ open, onOpenChange, contractId, onImportCompl
         setFile(null);
         setPreview(null);
         setDiscipline('');
+        setImportErrors([]);
     };
 
     return (
@@ -215,10 +266,21 @@ export function ExcelImportSheet({ open, onOpenChange, contractId, onImportCompl
                                 <CheckCircle className="h-8 w-8 text-green-600" />
                             </div>
                             <div>
-                                <h3 className="text-lg font-medium">Importação Concluída</h3>
-                                <p className="text-sm text-muted-foreground">
-                                    Todos os documentos foram adicionados à lista.
+                                <h3 className="text-lg font-medium">
+                                    {importErrors.length > 0 ? 'Importação Concluída com Alertas' : 'Importação Concluída'}
+                                </h3>
+                                <p className="text-sm text-muted-foreground mt-1">
+                                    {importErrors.length > 0
+                                        ? `${importErrors.length} itens foram ignorados. Baixe o relatório para corrigir.`
+                                        : 'Todos os documentos foram adicionados à lista.'}
                                 </p>
+
+                                {importErrors.length > 0 && (
+                                    <Button variant="destructive" className="mt-4 gap-2" onClick={handleDownloadErrors}>
+                                        <AlertCircle className="h-4 w-4" />
+                                        Baixar Relatório de Erros (.xlsx)
+                                    </Button>
+                                )}
                             </div>
                         </div>
                     )}

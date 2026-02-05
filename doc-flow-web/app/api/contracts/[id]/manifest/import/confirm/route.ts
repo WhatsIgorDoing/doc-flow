@@ -31,6 +31,7 @@ export async function POST(
         await workbook.xlsx.load(buffer);
 
         const itemsToInsert: any[] = [];
+        const failedItems: any[] = [];
 
         workbook.eachSheet((sheet, sheetId) => {
             // Processing logic - similar to preview
@@ -47,6 +48,12 @@ export async function POST(
                     updated_at: new Date().toISOString()
                 };
 
+                // Raw data for error reporting (without defaults)
+                const rawData: Record<string, any> = {
+                    _sheet: sheet.name,
+                    _row: rowNumber
+                };
+
                 let hasData = false;
                 Object.entries(template.columns).forEach(([colLetter, field]) => {
                     const cell = row.getCell(colLetter);
@@ -54,11 +61,20 @@ export async function POST(
                     if (val) {
                         hasData = true;
                         rowData[field] = val;
+                        rawData[field] = val;
                     }
                 });
 
-                if (hasData && rowData['document_code']) {
-                    itemsToInsert.push(rowData);
+                if (hasData) {
+                    if (rowData['document_code']) {
+                        itemsToInsert.push(rowData);
+                    } else {
+                        // Failed Row
+                        failedItems.push({
+                            ...rawData,
+                            _reason: 'Código do documento não encontrado (Coluna A)'
+                        });
+                    }
                 }
             });
         });
@@ -91,7 +107,10 @@ export async function POST(
             insertedCount += batch.length;
         }
 
-        return NextResponse.json({ count: insertedCount });
+        return NextResponse.json({
+            count: insertedCount,
+            errors: failedItems
+        });
 
     } catch (error) {
         console.error('Excel Import Error:', error);
