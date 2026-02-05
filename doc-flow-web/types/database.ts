@@ -80,6 +80,9 @@ export interface ManifestItem {
     document_type: string | null;
     category: string | null;
     expected_delivery_date: string | null;
+    actual_delivery_date: string | null;
+    unit: string | null;
+    external_status: string | null;
     responsible_email: string | null;
     metadata: Record<string, unknown>;
     discipline: 'quality' | 'commissioning' | 'cv' | null;

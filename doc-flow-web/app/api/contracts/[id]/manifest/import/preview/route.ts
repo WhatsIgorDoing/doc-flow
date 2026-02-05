@@ -40,13 +40,29 @@ export async function POST(
         const processedSheets: string[] = [];
 
         workbook.eachSheet((sheet, sheetId) => {
-            // Heuristic: Check if header row exists or just try to parse
-            // If the sheet strictly doesn't match the columns, it should yield 0 valid rows
-            // But we must be careful not to count random cells as "invalidRows" in a cover sheet.
-            // Strategy: Only count "invalidRows" if we found at least ONE valid row in the sheet?
-            // Or better: Just count. If a sheet is garbage, it might add to invalidRows, which is noise.
-            // Refined Strategy: If a sheet has NO valid 'document_code' in the first 50 rows, ignore it entirely?
-            // Let's stick to: Parse all. If 'document_code' is present, it's valid.
+            // Skip Cover/Legend sheets
+            const normalizedName = sheet.name.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const IGNORED = ['CAPA', 'LEGENDA', 'HISTORICO', 'REVISOES', 'LOG', 'INSTRUCOES'];
+            if (IGNORED.some(ignored => normalizedName.includes(ignored))) {
+                return;
+            }
+
+            // 1. Scan Headers to build dynamic map
+            const headerMap = new Map<string, number>(); // Field Name -> Column Index
+            const headerRow = sheet.getRow(template.headerRow);
+
+            headerRow.eachCell((cell, colNumber) => {
+                const cellText = cleanValue(cell.value)?.toString().trim().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") || '';
+
+                Object.entries(template.columns).forEach(([headerName, fieldKey]) => {
+                    const normalizedHeader = headerName.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                    if (cellText.includes(normalizedHeader) || normalizedHeader.includes(cellText)) {
+                        if (!headerMap.has(fieldKey)) {
+                            headerMap.set(fieldKey, colNumber);
+                        }
+                    }
+                });
+            });
 
             let sheetValidRows = 0;
 
@@ -56,8 +72,8 @@ export async function POST(
                 const rowData: Record<string, any> = {};
                 let hasData = false;
 
-                Object.entries(template.columns).forEach(([colLetter, field]) => {
-                    const cell = row.getCell(colLetter);
+                headerMap.forEach((colIndex, field) => {
+                    const cell = row.getCell(colIndex);
                     const val = cleanValue(cell.value);
                     if (val) hasData = true;
                     rowData[field] = val;
@@ -71,9 +87,8 @@ export async function POST(
                             sampleData.push({ ...rowData, _sheet: sheet.name });
                         }
                     } else {
-                        // Only count invalid if we are in a sheet that SEEMS to be data (has >0 valid rows so far or likely structure)
-                        // For now, let's just count global invalid, but maybe we shouldn't show it if it's too high (misinterpretation).
-                        invalidRows++;
+                        // Only count invalid if inside a valid data sheet
+                        if (sheetValidRows > 0) invalidRows++;
                     }
                 }
             });

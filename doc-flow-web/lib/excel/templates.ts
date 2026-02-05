@@ -18,9 +18,29 @@ export const EXCEL_TEMPLATES: Record<Discipline, TemplateConfig> = {
         headerRow: 9, // "CÓDIGO" header is usually around row 9
         startRow: 11, // Data starts after header
         columns: {
-            'A': 'document_code',
-            'B': 'title',
-            // Add other mappings as verified from LD-5290...003_B.xlsx
+            // Using Header Names for dynamic mapping
+            'DOCUMENTO N-1710': 'document_code',
+            'REVISÃO': 'revision',
+            'TÍTULO': 'title',
+            'UNIDADE/ÁREA': 'unit',
+            'ESCOPO': 'scope',
+            'PROPÓSITO DE EMISSÃO': 'purpose',
+            'DATA PREVISTA DE EMISSÃO': 'expected_delivery_date',
+            'DATA EFETIVA DE EMISSÃO': 'actual_delivery_date',
+            'N-1710': 'n1710',
+            'ISO 9001': 'iso9001',
+            'GRDT': 'grdt',
+            'STATUS': 'status_quality',
+            'PARA CONTRUÇÃO': 'for_construction',
+            'REVISÃO QUE ESTÁ LIBERADA': 'released_revision',
+            'EMISSOR': 'issuer',
+            'QUEM?': 'who',
+            'PRAZO': 'deadline',
+            'STATUS SIGEM': 'external_status',
+            'OBSERVAÇÕES': 'remarks',
+            'TAXONOMIA/CONSAG': 'taxonomy',
+            'ALOCAÇÃO SIGEM': 'allocation_sigem',
+            'PW': 'pw'
         },
         templatePath: '/templates/quality_template.xlsx'
     },
