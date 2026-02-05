@@ -78,6 +78,8 @@ const DOCUMENT_CODE_PATTERNS = [
     /\b([A-Z]{2}-\d{4}-[A-Z]{2}-\d{3})\b/gi,
     // Padrão genérico: letras + números separados por hífen
     /\b([A-Z]{2,5}-\d{3,6}(-[A-Z0-9]{1,4})*)\b/gi,
+    // Simple Project Code: XXX-123
+    /\b([A-Z]{3,}-\d{3,})\b/i,
 ];
 
 /**
@@ -285,39 +287,63 @@ export class ExtractionService {
      * NOTA: Implementação simplificada.
      * Em produção, use pdf-parse, pdfjs-dist, ou API externa.
      */
+    /**
+     * Extrai texto de PDF
+     */
     private async extractFromPdf(
         content: string | Buffer,
         _options: ExtractionOptions
     ): Promise<string> {
-        // Placeholder - em produção usar biblioteca de PDF
-        // Exemplo com pdf-parse:
-        // const pdfParse = require('pdf-parse');
-        // const data = await pdfParse(content);
-        // return data.text;
+        try {
+            // Se content for base64 string, converter para Buffer
+            let pdfBuffer: Buffer;
+            if (typeof content === 'string') {
+                // Check if it's base64 without prefix
+                const base64Data = content.includes('base64,')
+                    ? content.split('base64,')[1]
+                    : content;
+                pdfBuffer = Buffer.from(base64Data, 'base64');
+            } else {
+                pdfBuffer = content;
+            }
 
-        // Por ora, retornar texto vazio para indicar que precisa de OCR
-        console.log('[ExtractionService] PDF extraction placeholder');
-        return '';
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const pdfParse = require('pdf-parse');
+            const data = await pdfParse(pdfBuffer);
+            return data.text || '';
+        } catch (error) {
+            console.error('[ExtractionService] PDF extraction failed:', error);
+            // Se falhar o parse de texto, poderíamos tentar OCR em imagens do PDF,
+            // mas isso requer pdf-to-img converter.
+            // Por enquanto, retornamos vazio para indicar falha e talvez tentar OCR externo se configurado.
+            return '';
+        }
     }
 
     /**
      * Extrai texto de imagem via OCR
-     * 
-     * NOTA: Implementação simplificada.
-     * Em produção, use Tesseract.js, Google Vision, ou similar.
      */
     private async extractFromImage(
-        _content: string | Buffer,
+        content: string | Buffer,
         options: ExtractionOptions
     ): Promise<string> {
-        // Placeholder - em produção usar OCR
-        // Exemplo com Tesseract.js:
-        // const Tesseract = require('tesseract.js');
-        // const { data: { text } } = await Tesseract.recognize(content, options.language || 'por');
-        // return text;
+        try {
+            // Dynamic import to satisfy lint and ensure server-side execution
+            // eslint-disable-next-line @typescript-eslint/no-require-imports
+            const Tesseract = require('tesseract.js');
+            const lang = options.language || 'por'; // Default to Portuguese
 
-        console.log('[ExtractionService] OCR placeholder for language:', options.language || 'por');
-        return '';
+            // Tesseract aceita Buffer ou URL/Path
+            const { data: { text } } = await Tesseract.recognize(content, lang, {
+                // logger: m => console.log(m) // Uncomment for debug
+                errorHandler: (err: any) => console.error(err)
+            });
+
+            return text || '';
+        } catch (error) {
+            console.error('[ExtractionService] OCR extraction failed:', error);
+            return '';
+        }
     }
 
     /**

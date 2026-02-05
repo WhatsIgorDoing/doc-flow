@@ -19,50 +19,54 @@ export default {
         },
         extend: {
             colors: {
-                // Apple-inspired palette
-                background: '#F5F5F7',
-                foreground: '#1D1D1F',
-                glass: 'rgba(255, 255, 255, 0.72)',
+                // Precision v2 Palette (Paper & Ink)
+                background: '#F9F9FB', // Rice Paper
+                foreground: '#1A1D23', // Deep Ink
 
-                border: 'hsl(var(--border))',
-                input: 'hsl(var(--input))',
-                ring: 'hsl(var(--ring))',
+                border: '#E2E8F0', // Slate 200
+                input: '#E2E8F0',
+                ring: '#64748B',
+
+                surface: {
+                    DEFAULT: 'rgba(255, 255, 255, 0.8)', // Glass base
+                    foreground: '#1A1D23',
+                },
 
                 primary: {
-                    DEFAULT: '#0071E3',
+                    DEFAULT: '#24292F', // Ink Blue (Pro)
                     foreground: '#FFFFFF',
                 },
                 secondary: {
-                    DEFAULT: 'hsl(var(--secondary))',
-                    foreground: 'hsl(var(--secondary-foreground))',
+                    DEFAULT: '#F1F5F9', // Slate 100
+                    foreground: '#1E293B', // Slate 800
                 },
                 destructive: {
-                    DEFAULT: '#FF3B30',
+                    DEFAULT: '#E11D48', // Rose 600
                     foreground: '#FFFFFF',
                 },
                 muted: {
-                    DEFAULT: 'hsl(var(--muted))',
-                    foreground: 'hsl(var(--muted-foreground))',
+                    DEFAULT: '#F8FAFC', // Slate 50
+                    foreground: '#64748B', // Slate 500
                 },
                 accent: {
-                    DEFAULT: 'hsl(var(--accent))',
-                    foreground: 'hsl(var(--accent-foreground))',
+                    DEFAULT: '#F1F5F9', // Slate 100
+                    foreground: '#0F172A', // Slate 900
                 },
                 popover: {
-                    DEFAULT: 'hsl(var(--popover))',
-                    foreground: 'hsl(var(--popover-foreground))',
+                    DEFAULT: '#FFFFFF',
+                    foreground: '#1A1D23',
                 },
                 card: {
-                    DEFAULT: 'hsl(var(--card))',
-                    foreground: 'hsl(var(--card-foreground))',
+                    DEFAULT: '#FFFFFF',
+                    foreground: '#1A1D23',
                 },
                 success: {
-                    DEFAULT: '#34C759',
+                    DEFAULT: '#059669', // Emerald 600
                     foreground: '#FFFFFF',
                 },
                 warning: {
-                    DEFAULT: '#FF9F0A',
-                    foreground: '#1D1D1F',
+                    DEFAULT: '#D97706', // Amber 600
+                    foreground: '#FFFFFF',
                 },
             },
             borderRadius: {
@@ -83,6 +87,7 @@ export default {
             },
             boxShadow: {
                 glass: '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
+                layered: '0 1px 2px 0 rgba(0, 0, 0, 0.05), 0 4px 12px 0 rgba(0, 0, 0, 0.05)', // Ambient + Key
             },
             backdropBlur: {
                 glass: '10px',

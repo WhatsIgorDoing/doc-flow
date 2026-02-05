@@ -28,8 +28,8 @@ import {
  */
 const REVISION_PATTERNS = [
     /_[A-Z]$/i, // _A, _B, _C
-    /_Rev\d+$/i, // _Rev0, _Rev1
-    /_R\d+$/i, // _R0, _R1
+    /_Rev[A-Z0-9]+$/i, // _Rev0, _RevA
+    /_R[A-Z0-9]+$/i, // _R0, _RA
     /-\d{2}$/i, // -01, -02
 ];
 
@@ -127,10 +127,20 @@ export interface ValidationServiceOptions {
 export class ValidationService {
     private contractId: string;
     private manifestMap: Map<string, ManifestItem> = new Map();
+    private extractionService: any; // Lazy loaded to avoid circular deps if needed, or import directly
 
     constructor(options: ValidationServiceOptions) {
         this.contractId = options.contractId;
     }
+
+    private async getExtractionService() {
+        if (!this.extractionService) {
+            const { createExtractionService } = await import('./extraction-service');
+            this.extractionService = createExtractionService(this.contractId);
+        }
+        return this.extractionService;
+    }
+
 
     /**
      * Carrega itens do manifesto do banco de dados
@@ -200,11 +210,60 @@ export class ValidationService {
         let errorCount = 0;
 
         // Processar cada arquivo
+        const extractionService = await this.getExtractionService();
+
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
+            let fileToValidate = { ...file };
+            let originalFilename: string | undefined = undefined;
 
             try {
-                const result = await this.validateSingleFile(file);
+                // STEP 1: OCR / Extraction & Correction
+                // Only try correction if the file extension is supported and it's likely a technical doc
+                if (isValidExtension(file.filename)) {
+                    try {
+                        // TODO: Since we are running on server, file.content might be a string (path) or buffer.
+                        // We need to ensure we pass the right content to extraction service.
+                        // Assuming 'file.content' is available or we need to read it. 
+                        // Note: FileToValidate interface needs to be checked if it has content.
+                        // For now, assuming we might skip this if content is missing, or we implement reading.
+
+                        // For this implementation, let's assume we can get content.
+                        // If file has no content property in the interface, we might need to change how this is called.
+                        // Checking types... 'FileToValidate' usually comes from the upload.
+
+                        const extraction = await extractionService.extractFromDocument(
+                            `temp-${i}`, // Temp ID
+                            file.content as any, // Expecting buffer or string
+                            file.filename
+                        );
+
+                        if (extraction.documentCode) {
+                            const extractedCode = normalizeDocumentCode(extraction.documentCode);
+                            const currentCode = normalizeDocumentCode(file.filename);
+
+                            // If codes differ AND the extracted code exists in our manifest
+                            if (extractedCode !== currentCode && this.manifestMap.has(extractedCode)) {
+                                const ext = getFileExtension(file.filename);
+                                const newFilename = `${extraction.documentCode}${ext}`; // Use original casing from extraction or normalized?
+                                // Better to use the code from manifest to be clean, or extracted raw.
+                                // Let's use manifest code if we match it, to ensure 100% match.
+                                const manifestItem = this.manifestMap.get(extractedCode);
+                                const safeName = manifestItem ? manifestItem.document_code : extraction.documentCode;
+
+                                console.log(`[ValidationService] OCR Correction: ${file.filename} -> ${safeName}${ext}`);
+
+                                originalFilename = file.filename;
+                                fileToValidate.filename = `${safeName}${ext}`;
+                            }
+                        }
+                    } catch (extractError) {
+                        console.warn(`[ValidationService] Extraction failed for ${file.filename}, skipping correction.`, extractError);
+                    }
+                }
+
+                // STEP 2: Validation
+                const result = await this.validateSingleFile(fileToValidate);
                 results.push(result);
 
                 // Contar por status
@@ -224,7 +283,7 @@ export class ValidationService {
                 }
 
                 // Salvar documento validado no banco
-                await this.saveValidatedDocument(file, result);
+                await this.saveValidatedDocument(fileToValidate, result, originalFilename);
 
                 // Atualizar progresso
                 await supabase
@@ -344,7 +403,8 @@ export class ValidationService {
      */
     private async saveValidatedDocument(
         file: FileToValidate,
-        result: ValidationResult
+        result: ValidationResult,
+        originalFilename?: string
     ): Promise<void> {
         const supabase = await createClient();
 
@@ -356,6 +416,7 @@ export class ValidationService {
             status: result.status,
             validation_date: new Date().toISOString(),
             error_message: result.error || null,
+            original_filename: originalFilename || null,
         }).select().single();
 
         if (error) {

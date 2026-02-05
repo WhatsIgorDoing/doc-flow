@@ -1,0 +1,237 @@
+
+> doc-flow-web@0.1.0 lint
+> eslint
+
+
+C:\Development\doc-flow\doc-flow-web\__tests__\unit\batch-service.test.ts
+  10:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Development\doc-flow\doc-flow-web\__tests__\unit\extraction-service.test.ts
+  27:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  32:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Development\doc-flow\doc-flow-web\__tests__\unit\resolution-service.test.ts
+  12:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Development\doc-flow\doc-flow-web\app\(dashboard)\contracts\[id]\analytics\page.tsx
+   29:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   30:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   31:16  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  146:80  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  184:73  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Development\doc-flow\doc-flow-web\app\(dashboard)\contracts\[id]\batches\[batchId]\page.tsx
+  308:72  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  308:85  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Development\doc-flow\doc-flow-web\app\(dashboard)\contracts\[id]\batches\page.tsx
+    6:75  warning  'Square' is defined but never used        @typescript-eslint/no-unused-vars
+  130:62  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Development\doc-flow\doc-flow-web\app\(dashboard)\contracts\[id]\documents\documents-table.tsx
+  101:58  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Development\doc-flow\doc-flow-web\app\(dashboard)\contracts\page.tsx
+  52:55  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  78:63  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Development\doc-flow\doc-flow-web\app\api\contracts\[id]\batches\[batchId]\route.ts
+  1:10  warning  'createClient' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Development\doc-flow\doc-flow-web\app\api\validation\submit\route.ts
+  51:39  warning  'batch_name' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Development\doc-flow\doc-flow-web\components\batches\BatchDialog.tsx
+  25:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Development\doc-flow\doc-flow-web\components\batches\BatchExportButton.tsx
+   23:12  warning  'progress' is assigned a value but never used                                                                        @typescript-eslint/no-unused-vars
+   34:32  warning  'batch' is assigned a value but never used                                                                           @typescript-eslint/no-unused-vars
+   55:24  error    Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+   68:42  error    Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+   68:66  error    Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  152:24  error    Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  188:33  error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+
+C:\Development\doc-flow\doc-flow-web\components\batches\DeleteBatchDialog.tsx
+  15:12  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+  37:71  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  37:84  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Development\doc-flow\doc-flow-web\components\batches\batch-list.tsx
+  72:12  warning  'expandedId' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  72:24  warning  'setExpandedId' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Development\doc-flow\doc-flow-web\components\batches\document-assignment.tsx
+  100:63  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  100:75  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Development\doc-flow\doc-flow-web\components\manifest\DeleteConfirmDialog.tsx
+  69:76  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  69:97  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Development\doc-flow\doc-flow-web\components\manifest\ManifestTable.tsx
+  4:20  warning  'useMutation' is defined but never used     @typescript-eslint/no-unused-vars
+  4:33  warning  'useQueryClient' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Development\doc-flow\doc-flow-web\components\resolution\resolution-panel.tsx
+  26:33  warning  'ResolutionCandidate' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Development\doc-flow\doc-flow-web\components\validation\validation-dashboard.tsx
+  19:5   warning  'Clock' is defined but never used                     @typescript-eslint/no-unused-vars
+  25:10  warning  'Button' is defined but never used                    @typescript-eslint/no-unused-vars
+  43:42  warning  'validationStats' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Development\doc-flow\doc-flow-web\components\validation\validation-results.tsx
+  252:46  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+C:\Development\doc-flow\doc-flow-web\components\validation\validation-results.tsx:252:46
+  250 |                             >
+  251 |                                 <div className="flex items-center gap-1">
+> 252 |                                     Arquivo <SortIcon field="filename" />
+      |                                              ^^^^^^^^ This component is created during render
+  253 |                                 </div>
+  254 |                             </TableHead>
+  255 |                             <TableHead
+
+C:\Development\doc-flow\doc-flow-web\components\validation\validation-results.tsx:169:22
+  167 |     };
+  168 |
+> 169 |     const SortIcon = ({ field }: { field: SortField }) => {
+      |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 170 |         if (sortField !== field) return null;
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 171 |         return sortOrder === 'asc' ? (
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 172 |             <ChevronUp className="h-4 w-4" />
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 173 |         ) : (
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 174 |             <ChevronDown className="h-4 w-4" />
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 175 |         );
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 176 |     };
+      | ^^^^^^ The component is created during render here
+  177 |
+  178 |     return (
+  179 |         <div className="space-y-4">                                                             react-hooks/static-components
+  260:45  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+C:\Development\doc-flow\doc-flow-web\components\validation\validation-results.tsx:260:45
+  258 |                             >
+  259 |                                 <div className="flex items-center gap-1">
+> 260 |                                     Status <SortIcon field="status" />
+      |                                             ^^^^^^^^ This component is created during render
+  261 |                                 </div>
+  262 |                             </TableHead>
+  263 |                             <TableHead>Match</TableHead>
+
+C:\Development\doc-flow\doc-flow-web\components\validation\validation-results.tsx:169:22
+  167 |     };
+  168 |
+> 169 |     const SortIcon = ({ field }: { field: SortField }) => {
+      |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 170 |         if (sortField !== field) return null;
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 171 |         return sortOrder === 'asc' ? (
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 172 |             <ChevronUp className="h-4 w-4" />
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 173 |         ) : (
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 174 |             <ChevronDown className="h-4 w-4" />
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 175 |         );
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 176 |     };
+      | ^^^^^^ The component is created during render here
+  177 |
+  178 |     return (
+  179 |         <div className="space-y-4">                                               react-hooks/static-components
+  269:48  error  Error: Cannot create components during render
+
+Components created during render will reset their state each time they are created. Declare components outside of render.
+
+C:\Development\doc-flow\doc-flow-web\components\validation\validation-results.tsx:269:48
+  267 |                             >
+  268 |                                 <div className="flex items-center justify-end gap-1">
+> 269 |                                     Confian├ºa <SortIcon field="confidence" />
+      |                                                ^^^^^^^^ This component is created during render
+  270 |                                 </div>
+  271 |                             </TableHead>
+  272 |                             <TableHead className="text-right">A├º├Áes</TableHead>
+
+C:\Development\doc-flow\doc-flow-web\components\validation\validation-results.tsx:169:22
+  167 |     };
+  168 |
+> 169 |     const SortIcon = ({ field }: { field: SortField }) => {
+      |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 170 |         if (sortField !== field) return null;
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 171 |         return sortOrder === 'asc' ? (
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 172 |             <ChevronUp className="h-4 w-4" />
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 173 |         ) : (
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 174 |             <ChevronDown className="h-4 w-4" />
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 175 |         );
+      | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 176 |     };
+      | ^^^^^^ The component is created during render here
+  177 |
+  178 |     return (
+  179 |         <div className="space-y-4">  react-hooks/static-components
+
+C:\Development\doc-flow\doc-flow-web\e2e\validation-flow.spec.ts
+  2:8  warning  'path' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Development\doc-flow\doc-flow-web\lib\dcs\events\dcs-handlers.ts
+  55:5  warning  'timestamp' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Development\doc-flow\doc-flow-web\lib\validator\events\validator-handlers.ts
+  21:5  warning  'timestamp' is defined but never used  @typescript-eslint/no-unused-vars
+  40:5  warning  'timestamp' is defined but never used  @typescript-eslint/no-unused-vars
+  61:5  warning  'timestamp' is defined but never used  @typescript-eslint/no-unused-vars
+  80:5  warning  'timestamp' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Development\doc-flow\doc-flow-web\lib\validator\services\extraction-service.ts
+  295:9   warning  '_options' is defined but never used      @typescript-eslint/no-unused-vars
+  310:30  error    A `require()` style import is forbidden   @typescript-eslint/no-require-imports
+  330:31  error    A `require()` style import is forbidden   @typescript-eslint/no-require-imports
+  336:37  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Development\doc-flow\doc-flow-web\lib\validator\services\resolution-service.ts
+  10:10  warning  'createValidationService' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Development\doc-flow\doc-flow-web\lib\validator\services\upload-service.ts
+  55:19  warning  'results' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+C:\Development\doc-flow\doc-flow-web\lib\validator\services\validation-service.ts
+  130:32  error    Unexpected any. Specify a different type                   @typescript-eslint/no-explicit-any
+  217:17  error    'fileToValidate' is never reassigned. Use 'const' instead  prefer-const
+  237:45  error    Unexpected any. Specify a different type                   @typescript-eslint/no-explicit-any
+  248:39  warning  'newFilename' is assigned a value but never used           @typescript-eslint/no-unused-vars
+
+C:\Development\doc-flow\doc-flow-web\tailwind.config.ts
+  106:15  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+C:\Development\doc-flow\doc-flow-web\test-supabase.js
+  2:26  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+C:\Development\doc-flow\doc-flow-web\types\database.ts
+   31:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   45:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   84:30  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  104:35  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  118:29  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+Ô£û 67 problems (44 errors, 23 warnings)
+  1 error and 0 warnings potentially fixable with the `--fix` option.
+

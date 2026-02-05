@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FileText, List, FolderOpen, BarChart3, Upload, HelpCircle } from 'lucide-react';
+import { LayoutDashboard, ListChecks, FolderSearch, Scale, Layers } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface ContractNavProps {
@@ -11,34 +11,24 @@ interface ContractNavProps {
 
 const navItems = [
     {
-        href: (id: string) => `/contracts/${id}/documents`,
-        label: 'Documentos',
-        icon: FileText,
+        href: (id: string) => `/contracts/${id}/overview`,
+        label: 'Visão Geral',
+        icon: LayoutDashboard,
     },
     {
         href: (id: string) => `/contracts/${id}/manifest`,
-        label: 'Manifesto',
-        icon: List,
+        label: 'Lista de documentos',
+        icon: ListChecks,
     },
     {
-        href: (id: string) => `/contracts/${id}/validation`,
-        label: 'Validação',
-        icon: Upload,
-    },
-    {
-        href: (id: string) => `/contracts/${id}/resolution`,
-        label: 'Resolução',
-        icon: HelpCircle,
+        href: (id: string) => `/contracts/${id}/explorer`,
+        label: 'Explorador',
+        icon: FolderSearch,
     },
     {
         href: (id: string) => `/contracts/${id}/batches`,
-        label: 'Lotes',
-        icon: FolderOpen,
-    },
-    {
-        href: (id: string) => `/contracts/${id}/analytics`,
-        label: 'Analytics',
-        icon: BarChart3,
+        label: 'Gestão de Lotes',
+        icon: Layers,
     },
 ];
 
@@ -46,8 +36,8 @@ export function ContractNav({ contractId }: ContractNavProps) {
     const pathname = usePathname();
 
     return (
-        <nav className="border-b border-gray-200 mb-6">
-            <div className="flex gap-1">
+        <nav className="mb-6 border-b border-border pl-1">
+            <div className="flex gap-6">
                 {navItems.map((item) => {
                     const href = item.href(contractId);
                     const isActive = pathname === href;
@@ -58,14 +48,14 @@ export function ContractNav({ contractId }: ContractNavProps) {
                             key={href}
                             href={href}
                             className={cn(
-                                'flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors',
-                                'border-b-2 -mb-px',
+                                'group flex items-center gap-2 border-b-2 py-3 text-sm font-medium transition-colors',
+                                '-mb-[2px]', // Overlap border
                                 isActive
-                                    ? 'border-blue-600 text-blue-600'
-                                    : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
+                                    ? 'border-primary text-primary'
+                                    : 'border-transparent text-muted-foreground hover:border-muted-foreground/20 hover:text-foreground'
                             )}
                         >
-                            <Icon className="h-4 w-4" />
+                            <Icon className="h-4 w-4" strokeWidth={1.5} />
                             {item.label}
                         </Link>
                     );

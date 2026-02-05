@@ -7,12 +7,13 @@ import {
 } from '@/lib/validator/services/validation-service';
 
 describe('ValidationService Helpers', () => {
-    describe('normalizeDocumentCode', () => {
-        it('should normalize code by removing extension and revision', () => {
-            expect(normalizeDocumentCode('DOC-001.pdf')).toBe('DOC-001');
-            expect(normalizeDocumentCode('DOC-001_RevA.pdf')).toBe('DOC-001');
-            expect(normalizeDocumentCode('doc-001.pdf')).toBe('DOC-001');
-        });
+    it('should normalize code by removing extension and revision', () => {
+        // The implementation splits by dot if accepted extension.
+        // DOC-001.pdf -> DOC-001
+        // DOC-001_RevA.pdf -> DOC-001_RevA -> DOC-001
+        expect(normalizeDocumentCode('DOC-001.pdf')).toBe('DOC-001');
+        expect(normalizeDocumentCode('DOC-001_RevA.pdf')).toBe('DOC-001');
+        expect(normalizeDocumentCode('doc-001.pdf')).toBe('DOC-001');
     });
 
     describe('isValidExtension', () => {

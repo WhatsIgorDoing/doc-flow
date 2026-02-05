@@ -15,8 +15,11 @@ describe('ResolutionService', () => {
         vi.clearAllMocks();
 
         mockSupabase = {
-            from: vi.fn(),
-            select: vi.fn(),
+            from: vi.fn().mockReturnThis(),
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockResolvedValue({ data: { id: 'doc-id' } }),
+            insert: vi.fn().mockResolvedValue({ error: null }),
+            update: vi.fn().mockResolvedValue({ error: null }),
         }
 
         vi.mocked(createClient).mockResolvedValue(mockSupabase);
@@ -32,8 +35,8 @@ describe('ResolutionService', () => {
                 { manifestItemId: '2', documentCode: 'DOC-124', similarity: 0.8 },
             ]);
 
-            // Inject mock to prototype or instance if possible, or mock module
-            ExtractionService.prototype.suggestMatches = mockSuggestMatches;
+            // Spy on the prototype to ensure the method is replaced for all instances
+            vi.spyOn(ExtractionService.prototype, 'suggestMatches').mockImplementation(mockSuggestMatches);
 
             const candidates = await service.getCandidates('doc-id');
 

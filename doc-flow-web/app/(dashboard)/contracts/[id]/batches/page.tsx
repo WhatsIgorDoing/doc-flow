@@ -1,26 +1,18 @@
 'use client';
 
-import { use } from 'react';
-import { useState } from 'react';
+import { use, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Calendar, FolderOpen, Trash2, Edit, FileText, CheckSquare, Square } from 'lucide-react';
+import { Plus, Calendar, FolderOpen, Trash2, Edit, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { BatchDialog } from '@/components/batches/BatchDialog';
 import { DeleteBatchDialog } from '@/components/batches/DeleteBatchDialog';
-import { BatchExportButton } from '@/components/batches/BatchExportButton';
+import { BatchDetail } from '@/components/batches/BatchDetail';
+import { AnalyticsDashboard } from '@/components/batches/AnalyticsDashboard';
 import { toast } from 'sonner';
-import { Checkbox } from '@/components/ui/checkbox';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+import { cn } from '@/lib/utils';
 
 interface Batch {
     id: string;
@@ -34,13 +26,6 @@ interface Batch {
     created_at: string;
 }
 
-interface UnassignedDocument {
-    id: string;
-    filename: string;
-    status: string;
-    validation_date: string;
-}
-
 export default function BatchesPage({
     params
 }: {
@@ -51,10 +36,11 @@ export default function BatchesPage({
 
     const [dialogOpen, setDialogOpen] = useState(false);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [selectedBatch, setSelectedBatch] = useState<Batch | null>(null);
-    const [selectedDocs, setSelectedDocs] = useState<string[]>([]);
+    const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
+    const [batchToDelete, setBatchToDelete] = useState<Batch | null>(null);
+    const [batchToEdit, setBatchToEdit] = useState<Batch | null>(null);
 
-    // 1. Fetch Batches
+    // Fetch Batches
     const { data: batchesData, isLoading: isLoadingBatches } = useQuery({
         queryKey: ['batches', contractId],
         queryFn: async () => {
@@ -64,8 +50,8 @@ export default function BatchesPage({
         },
     });
 
-    // 2. Fetch Unassigned Documents
-    const { data: unassignedData, isLoading: isLoadingDocs } = useQuery({
+    // Fetch Unassigned Docs (needed for Create Dialog)
+    const { data: unassignedData } = useQuery({
         queryKey: ['unassigned-docs', contractId],
         queryFn: async () => {
             const res = await fetch(`/api/validation/${contractId}/documents?unassigned=true`);
@@ -85,279 +71,144 @@ export default function BatchesPage({
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['batches', contractId] });
-            queryClient.invalidateQueries({ queryKey: ['unassigned-docs', contractId] }); // Docs return to pool
+            queryClient.invalidateQueries({ queryKey: ['unassigned-docs', contractId] });
             toast.success('Lote deletado com sucesso');
             setDeleteDialogOpen(false);
-            setSelectedBatch(null);
+            setBatchToDelete(null);
+            if (selectedBatchId === batchToDelete?.id) {
+                setSelectedBatchId(null);
+            }
         },
         onError: () => {
             toast.error('Erro ao deletar lote');
         },
     });
 
-    const handleEdit = (batch: Batch) => {
-        setSelectedBatch(batch);
-        setSelectedDocs([]); // Edit doesn't change docs here
+    const handleCreateNew = () => {
+        setBatchToEdit(null);
         setDialogOpen(true);
     };
 
-    const handleDelete = (batch: Batch) => {
-        setSelectedBatch(batch);
+    const handleEdit = (e: React.MouseEvent, batch: Batch) => {
+        e.stopPropagation();
+        setBatchToEdit(batch);
+        setDialogOpen(true);
+    };
+
+    const handleDelete = (e: React.MouseEvent, batch: Batch) => {
+        e.stopPropagation();
+        setBatchToDelete(batch);
         setDeleteDialogOpen(true);
     };
 
-    const handleCreateNew = () => {
-        setSelectedBatch(null);
-        // If we clicked "Create Batch" from the top button, we might want to clear selection or keep it?
-        // Let's assume top button = empty batch or whatever is selected.
-        // Actually, logical flow: Select docs -> Click "Create with Selected"
-        // But we also need "Create Empty". 
-        // We'll use the same dialog.
-        setDialogOpen(true);
-    };
-
-    const handleCreateWithSelection = () => {
-        if (selectedDocs.length === 0) {
-            toast.error('Selecione pelo menos um documento');
-            return;
-        }
-        setSelectedBatch(null);
-        setDialogOpen(true);
-    };
-
-    const toggleSelectAll = (checked: boolean) => {
-        if (checked && unassignedData?.documents) {
-            setSelectedDocs(unassignedData.documents.map((d: any) => d.id));
-        } else {
-            setSelectedDocs([]);
-        }
-    };
-
-    const toggleSelectDoc = (docId: string) => {
-        setSelectedDocs(prev =>
-            prev.includes(docId)
-                ? prev.filter(id => id !== docId)
-                : [...prev, docId]
-        );
-    };
-
-    if (isLoadingBatches || isLoadingDocs) {
-        return (
-            <div>
-                <Skeleton className="h-8 w-64 mb-8" />
-                <Skeleton className="h-64 w-full mb-8" />
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {[1, 2, 3].map((i) => (
-                        <Skeleton key={i} className="h-48" />
-                    ))}
-                </div>
-            </div>
-        );
-    }
-
     const batches: Batch[] = batchesData?.batches || [];
-    const unassignedDocs: UnassignedDocument[] = unassignedData?.documents || [];
 
     return (
-        <div className="space-y-8">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Lotes de Validação</h1>
-                    <p className="text-gray-600 mt-2">
-                        Organize e exporte documentos validados
-                    </p>
-                </div>
-                <Button onClick={handleCreateNew}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Novo Lote (Vazio)
-                </Button>
-            </div>
-
-            {/* UNASSIGNED DOCUMENTS SECTION */}
-            <Card className="border-blue-100 bg-blue-50/30">
-                <CardHeader>
+        <div className="flex h-[calc(100vh-3.5rem)] -m-8 overflow-hidden bg-background">
+            {/* Sidebar (Master) */}
+            <div className="w-1/3 min-w-[320px] border-r flex flex-col bg-slate-50/50">
+                <div className="p-4 border-b space-y-4">
                     <div className="flex items-center justify-between">
-                        <div>
-                            <CardTitle className="text-xl flex items-center gap-2">
-                                <FileText className="h-5 w-5 text-blue-600" />
-                                Documentos Disponíveis ({unassignedDocs.length})
-                            </CardTitle>
-                            <CardDescription>
-                                Documentos validados aguardando atribuição a um lote.
-                            </CardDescription>
-                        </div>
-                        <Button
-                            onClick={handleCreateWithSelection}
-                            disabled={selectedDocs.length === 0}
-                            className={selectedDocs.length > 0 ? "bg-blue-600 hover:bg-blue-700" : ""}
-                        >
+                        <h2 className="font-semibold text-lg">Lotes</h2>
+                        <Button size="sm" onClick={handleCreateNew}>
                             <Plus className="h-4 w-4 mr-2" />
-                            Criar Lote com Seleção ({selectedDocs.length})
+                            Novo Lote
                         </Button>
                     </div>
-                </CardHeader>
-                <CardContent>
-                    {unassignedDocs.length === 0 ? (
-                        <div className="text-center py-8 text-muted-foreground">
-                            <CheckSquare className="h-8 w-8 mx-auto mb-2 opacity-20" />
-                            <p>Todos os documentos validados já estão em lotes.</p>
+                    {/* Inbox / Unassigned Summary */}
+                    <button
+                        onClick={() => setSelectedBatchId(null)}
+                        className={cn(
+                            "w-full flex items-center gap-3 p-3 rounded-lg border text-left transition-colors",
+                            selectedBatchId === null
+                                ? "bg-white border-primary shadow-sm"
+                                : "hover:bg-white/50 border-transparent hover:border-border"
+                        )}
+                    >
+                        <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                            <LayoutDashboard className="h-5 w-5" />
+                        </div>
+                        <div>
+                            <p className="font-medium text-sm">Painel Geral</p>
+                            <p className="text-xs text-muted-foreground">Analytics & Métricas</p>
+                        </div>
+                    </button>
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                    {isLoadingBatches ? (
+                        [1, 2, 3].map(i => <Skeleton key={i} className="h-20 w-full" />)
+                    ) : batches.length === 0 ? (
+                        <div className="text-center py-8 text-muted-foreground text-sm">
+                            Nenhum lote criado.
                         </div>
                     ) : (
-                        <div className="bg-white rounded-md border shadow-sm max-h-[300px] overflow-y-auto">
-                            <Table>
-                                <TableHeader className="sticky top-0 bg-white z-10">
-                                    <TableRow>
-                                        <TableHead className="w-[50px]">
-                                            <Checkbox
-                                                checked={unassignedDocs.length > 0 && selectedDocs.length === unassignedDocs.length}
-                                                onCheckedChange={toggleSelectAll}
-                                            />
-                                        </TableHead>
-                                        <TableHead>Arquivo</TableHead>
-                                        <TableHead>Data Validação</TableHead>
-                                        <TableHead>Status</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {unassignedDocs.map((doc) => (
-                                        <TableRow key={doc.id} className="hover:bg-gray-50">
-                                            <TableCell>
-                                                <Checkbox
-                                                    checked={selectedDocs.includes(doc.id)}
-                                                    onCheckedChange={() => toggleSelectDoc(doc.id)}
-                                                />
-                                            </TableCell>
-                                            <TableCell className="font-mono text-sm">{doc.filename}</TableCell>
-                                            <TableCell>
-                                                {doc.validation_date ? new Date(doc.validation_date).toLocaleDateString('pt-BR') : '-'}
-                                            </TableCell>
-                                            <TableCell>
-                                                <Badge variant="outline" className="text-green-600 bg-green-50 border-green-200">
-                                                    {doc.status}
-                                                </Badge>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </div>
+                        batches.map((batch) => (
+                            <div
+                                key={batch.id}
+                                onClick={() => setSelectedBatchId(batch.id)}
+                                className={cn(
+                                    "group relative p-4 rounded-lg border transition-all cursor-pointer hover:shadow-md",
+                                    selectedBatchId === batch.id
+                                        ? "bg-white border-primary shadow-sm ring-1 ring-primary"
+                                        : "bg-white border-border hover:border-primary/50"
+                                )}
+                            >
+                                <div className="flex justify-between items-start mb-2">
+                                    <h3 className="font-medium truncate pr-6 text-foreground">{batch.name}</h3>
+                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity absolute right-2 top-2 bg-white/80 rounded-md shadow-sm">
+                                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={(e) => handleEdit(e, batch)}>
+                                            <Edit className="h-3 w-3" />
+                                        </Button>
+                                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={(e) => handleDelete(e, batch)}>
+                                            <Trash2 className="h-3 w-3 text-destructive" />
+                                        </Button>
+                                    </div>
+                                </div>
+                                <div className="flex justify-between items-end">
+                                    <div className="text-xs text-muted-foreground">
+                                        {new Date(batch.created_at).toLocaleDateString('pt-BR')}
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Badge variant="secondary" className="text-[10px] h-5">
+                                            {batch.total_items} itens
+                                        </Badge>
+                                        <div className={cn("h-2 w-2 rounded-full", batch.validated_at ? "bg-emerald-500" : "bg-amber-500")} />
+                                    </div>
+                                </div>
+                            </div>
+                        ))
                     )}
-                </CardContent>
-            </Card>
-
-            {/* BATCHES LIST SECTION */}
-            {batches.length === 0 ? (
-                <Card>
-                    <CardContent className="flex flex-col items-center justify-center py-16">
-                        <FolderOpen className="h-16 w-16 text-gray-300 mb-4" />
-                        <h3 className="text-lg font-semibold text-gray-700 mb-2">
-                            Nenhum lote criado
-                        </h3>
-                        <p className="text-gray-500 mb-4">
-                            Crie seu primeiro lote acima usando os documentos disponíveis.
-                        </p>
-                    </CardContent>
-                </Card>
-            ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {batches.map((batch) => {
-                        const successRate = batch.total_items > 0
-                            ? Math.round((batch.valid_count / batch.total_items) * 100)
-                            : 0;
-
-                        return (
-                            <Card key={batch.id} className="hover:shadow-lg transition-shadow flex flex-col">
-                                <CardHeader className="pb-3">
-                                    <div className="flex items-start justify-between">
-                                        <div className="flex-1 min-w-0">
-                                            <CardTitle className="text-lg mb-1 truncate" title={batch.name}>
-                                                {batch.name}
-                                            </CardTitle>
-                                            {batch.description && (
-                                                <p className="text-sm text-gray-500 line-clamp-2" title={batch.description}>
-                                                    {batch.description}
-                                                </p>
-                                            )}
-                                        </div>
-                                        <div className="flex gap-1 -mr-2">
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => handleEdit(batch)}
-                                            >
-                                                <Edit className="h-4 w-4" />
-                                            </Button>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => handleDelete(batch)}
-                                            >
-                                                <Trash2 className="h-4 w-4 text-red-500" />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="flex-1 flex flex-col gap-4">
-                                    <div className="space-y-3">
-                                        <div className="flex items-center text-sm text-gray-600">
-                                            <Calendar className="h-4 w-4 mr-2" />
-                                            {new Date(batch.validated_at).toLocaleDateString('pt-BR')}
-                                        </div>
-
-                                        <div className="grid grid-cols-2 gap-2 text-sm">
-                                            <div className="bg-gray-50 p-2 rounded">
-                                                <p className="text-gray-600 text-xs">Total</p>
-                                                <p className="font-bold text-lg">{batch.total_items}</p>
-                                            </div>
-                                            <div className="bg-green-50 p-2 rounded">
-                                                <p className="text-green-600 text-xs">Válidos</p>
-                                                <p className="font-bold text-lg text-green-700">
-                                                    {batch.valid_count}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <div className="pt-2 border-t">
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-sm text-gray-600">Qualidade</span>
-                                                <Badge variant={
-                                                    successRate >= 90 ? 'default' :
-                                                        successRate >= 70 ? 'secondary' :
-                                                            'destructive'
-                                                }>
-                                                    {successRate}%
-                                                </Badge>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="mt-auto pt-2">
-                                        <BatchExportButton
-                                            contractId={contractId}
-                                            batchId={batch.id}
-                                            batchName={batch.name}
-                                        />
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        );
-                    })}
                 </div>
-            )}
+            </div>
 
+            {/* Content (Detail) */}
+            <div className="flex-1 bg-background overflow-hidden">
+                {selectedBatchId ? (
+                    <BatchDetail
+                        key={selectedBatchId} // Force remount on change
+                        contractId={contractId}
+                        batchId={selectedBatchId}
+                    />
+                ) : (
+                    <AnalyticsDashboard contractId={contractId} />
+                )}
+            </div>
+
+            {/* Dialogs */}
             <BatchDialog
                 contractId={contractId}
-                batch={selectedBatch}
+                batch={batchToEdit}
                 open={dialogOpen}
                 onOpenChange={setDialogOpen}
-                selectedDocumentIds={selectedDocs}
+                selectedDocumentIds={[]} // Main creation doesn't pre-select docs from this view
             />
 
             <DeleteBatchDialog
-                batch={selectedBatch}
+                batch={batchToDelete}
                 open={deleteDialogOpen}
                 onOpenChange={setDeleteDialogOpen}
-                onConfirm={() => selectedBatch && deleteMutation.mutate(selectedBatch.id)}
+                onConfirm={() => batchToDelete && deleteMutation.mutate(batchToDelete.id)}
                 isDeleting={deleteMutation.isPending}
             />
         </div>

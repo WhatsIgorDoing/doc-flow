@@ -106,6 +106,24 @@ const STATUS_CONFIG = {
 // COMPONENT
 // ============================================================================
 
+// Helper Component for Sorting
+const SortIcon = ({
+    field,
+    currentSortField,
+    sortOrder
+}: {
+    field: SortField;
+    currentSortField: SortField;
+    sortOrder: 'asc' | 'desc';
+}) => {
+    if (currentSortField !== field) return null;
+    return sortOrder === 'asc' ? (
+        <ChevronUp className="h-4 w-4" />
+    ) : (
+        <ChevronDown className="h-4 w-4" />
+    );
+};
+
 export function ValidationResults({
     results,
     summary,
@@ -166,14 +184,8 @@ export function ValidationResults({
         }
     };
 
-    const SortIcon = ({ field }: { field: SortField }) => {
-        if (sortField !== field) return null;
-        return sortOrder === 'asc' ? (
-            <ChevronUp className="h-4 w-4" />
-        ) : (
-            <ChevronDown className="h-4 w-4" />
-        );
-    };
+    // SortIcon removed from here
+
 
     return (
         <div className="space-y-4">
@@ -240,36 +252,40 @@ export function ValidationResults({
             </div>
 
             {/* Table */}
-            <div className="border rounded-lg overflow-hidden">
+            <div className="border border-gray-100 rounded-lg overflow-hidden shadow-sm bg-white">
                 <Table>
                     <TableHeader>
                         <TableRow>
                             <TableHead
-                                className="cursor-pointer hover:bg-muted/50"
+                                className="cursor-pointer hover:bg-black/5 py-2 px-3 h-9 text-xs font-semibold text-gray-500 uppercase tracking-wider"
                                 onClick={() => handleSort('filename')}
                             >
                                 <div className="flex items-center gap-1">
-                                    Arquivo <SortIcon field="filename" />
+                                    Arquivo <SortIcon field="filename" currentSortField={sortField} sortOrder={sortOrder} />
                                 </div>
                             </TableHead>
                             <TableHead
-                                className="cursor-pointer hover:bg-muted/50"
+                                className="cursor-pointer hover:bg-black/5 py-2 px-3 h-9 text-xs font-semibold text-gray-500 uppercase tracking-wider"
                                 onClick={() => handleSort('status')}
                             >
                                 <div className="flex items-center gap-1">
-                                    Status <SortIcon field="status" />
+                                    Status <SortIcon field="status" currentSortField={sortField} sortOrder={sortOrder} />
                                 </div>
                             </TableHead>
-                            <TableHead>Match</TableHead>
+                            <TableHead className="py-2 px-3 h-9 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                Match
+                            </TableHead>
                             <TableHead
-                                className="cursor-pointer hover:bg-muted/50 text-right"
+                                className="cursor-pointer hover:bg-black/5 text-right py-2 px-3 h-9 text-xs font-semibold text-gray-500 uppercase tracking-wider"
                                 onClick={() => handleSort('confidence')}
                             >
                                 <div className="flex items-center justify-end gap-1">
-                                    Confiança <SortIcon field="confidence" />
+                                    Confiança <SortIcon field="confidence" currentSortField={sortField} sortOrder={sortOrder} />
                                 </div>
                             </TableHead>
-                            <TableHead className="text-right">Ações</TableHead>
+                            <TableHead className="text-right py-2 px-3 h-9 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                Ações
+                            </TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -290,40 +306,46 @@ export function ValidationResults({
                                             className="cursor-pointer hover:bg-muted/50"
                                             onClick={() => toggleRow(result.filename)}
                                         >
-                                            <TableCell className="font-mono text-sm">
+                                            <TableCell className="font-mono text-sm py-2 px-3 text-ink-900 border-none">
                                                 {result.filename}
                                             </TableCell>
-                                            <TableCell>
-                                                <Badge variant="outline" className={config.bgColor}>
-                                                    <config.icon className={cn('mr-1 h-3 w-3', config.color)} />
+                                            <TableCell className="py-2 px-3 border-none">
+                                                <Badge
+                                                    variant="outline"
+                                                    className={cn(
+                                                        'rounded-md px-2 py-0.5 font-medium border-0',
+                                                        config.bgColor
+                                                    )}
+                                                >
+                                                    <config.icon className={cn('mr-1.5 h-3 w-3', config.color)} />
                                                     {config.label}
                                                 </Badge>
                                             </TableCell>
-                                            <TableCell>
+                                            <TableCell className="py-2 px-3 border-none">
                                                 {result.matched_document_code ? (
-                                                    <span className="font-mono text-sm">
+                                                    <span className="font-mono text-sm font-medium text-ink-800">
                                                         {result.matched_document_code}
                                                     </span>
                                                 ) : (
-                                                    <span className="text-muted-foreground">-</span>
+                                                    <span className="text-muted-foreground/30 text-xs">-</span>
                                                 )}
                                             </TableCell>
-                                            <TableCell className="text-right">
+                                            <TableCell className="text-right py-2 px-3 border-none">
                                                 {result.confidence > 0 ? (
                                                     <span
                                                         className={cn(
-                                                            'font-medium',
+                                                            'font-mono text-sm tabular-nums',
                                                             result.confidence >= 0.9
-                                                                ? 'text-green-600'
+                                                                ? 'text-green-600 font-bold'
                                                                 : result.confidence >= 0.7
-                                                                    ? 'text-yellow-600'
-                                                                    : 'text-red-600'
+                                                                    ? 'text-yellow-600 font-medium'
+                                                                    : 'text-red-500'
                                                         )}
                                                     >
                                                         {(result.confidence * 100).toFixed(0)}%
                                                     </span>
                                                 ) : (
-                                                    <span className="text-muted-foreground">-</span>
+                                                    <span className="text-muted-foreground/30 text-xs">-</span>
                                                 )}
                                             </TableCell>
                                             <TableCell className="text-right">

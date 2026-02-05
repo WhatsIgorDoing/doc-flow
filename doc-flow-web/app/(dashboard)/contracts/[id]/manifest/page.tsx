@@ -21,7 +21,7 @@ export default function ManifestPage({
             <div className="mb-8 flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900">
-                        Manifesto
+                        Lista de documentos
                     </h1>
                     <p className="mt-2 text-sm text-gray-600">
                         Gerencie os itens do manifesto do contrato

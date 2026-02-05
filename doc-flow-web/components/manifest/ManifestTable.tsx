@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import {
     Table,
     TableBody,
@@ -16,15 +16,39 @@ import { Badge } from '@/components/ui/badge';
 import { Pencil, Trash2, Search } from 'lucide-react';
 import { ManifestItemDialog } from './ManifestItemDialog';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 interface ManifestItem {
     id: string;
-    document_code: string;
-    revision: string | null;
-    title: string | null;
+    // Mapped Fields
+    index?: number;
+    document_code: string; // DOCUMENTO N-1710
+    revision: string | null; // REVISÃO
+    title: string | null; // TÍTULO
+    unit: string | null; // UNIDADE/ÁREA
+    discipline: string | null; // DISCIPLINA
+    scope: string | null; // ESCOPO
+    purpose: string | null; // PROPÓSITO DE EMISSÃO
+    expected_delivery_date: string | null; // DATA PREVISTA DE EMISSÃO
+    actual_delivery_date?: string | null; // DATA EFETIVA DE EMISSÃO
+    n1710?: boolean; // N-1710
+    iso9001?: boolean; // ISO 9001
+    grdt?: string | null; // GRDT
+    status?: string | null; // STATUS
+    for_construction?: boolean; // PARA CONTRUÇÃO
+    released_revision?: string | null; // REVISÃO QUE ESTÁ LIBERADA
+    issuer?: string | null; // EMISSOR
+    who?: string | null; // QUEM?
+    deadline?: string | null; // PRAZO
+    status_sigem?: string | null; // STATUS SIGEM
+    remarks?: string | null; // OBSERVAÇÕES
+    taxonomy?: string | null; // TAXONOMIA/CONSAG
+    allocation_sigem?: string | null; // ALOCAÇÃO SIGEM
+    pw?: string | null; // PW
+
+    // Existing/Legacy
     document_type: string | null;
     category: string | null;
-    expected_delivery_date: string | null;
     responsible_email: string | null;
     created_at: string;
 }
@@ -62,7 +86,7 @@ export function ManifestTable({ contractId }: ManifestTableProps) {
     if (error) {
         return (
             <div className="text-center py-8 text-red-600">
-                Erro ao carregar manifesto: {(error as Error).message}
+                Erro ao carregar lista de documentos: {(error as Error).message}
             </div>
         );
     }
@@ -70,99 +94,114 @@ export function ManifestTable({ contractId }: ManifestTableProps) {
     const items: ManifestItem[] = data?.data || [];
     const pagination = data?.pagination;
 
-    const getCategoryBadge = (category: string | null) => {
-        if (!category) return <Badge variant="secondary">Sem categoria</Badge>;
-
-        const variants: Record<string, 'default' | 'secondary' | 'outline'> = {
-            'Technical': 'default',
-            'Management': 'secondary',
-            'Quality': 'outline',
-        };
-
-        return <Badge variant={variants[category] || 'secondary'}>{category}</Badge>;
-    };
-
     return (
         <div className="space-y-4">
-            {/* Search */}
+            {/* Toolbar */}
             <div className="flex items-center gap-2">
-                <Search className="h-5 w-5 text-gray-400" />
-                <Input
-                    placeholder="Buscar por código, título ou tipo..."
-                    value={search}
-                    onChange={(e) => {
-                        setSearch(e.target.value);
-                        setPage(1);
-                    }}
-                    className="max-w-sm"
-                />
+                <div className="relative flex-1 max-w-sm">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                        placeholder="Buscar documentos..."
+                        value={search}
+                        onChange={(e) => {
+                            setSearch(e.target.value);
+                            setPage(1);
+                        }}
+                        className="pl-9"
+                    />
+                </div>
             </div>
 
-            {/* Table */}
-            <div className="rounded-md border">
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Código</TableHead>
-                            <TableHead>Revisão</TableHead>
-                            <TableHead>Título</TableHead>
-                            <TableHead>Tipo</TableHead>
-                            <TableHead>Categoria</TableHead>
-                            <TableHead>Responsável</TableHead>
-                            <TableHead className="text-right">Ações</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {items.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={7} className="text-center text-gray-500">
-                                    Nenhum item encontrado
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            items.map((item) => (
-                                <TableRow key={item.id}>
-                                    <TableCell className="font-medium font-mono text-sm">
-                                        {item.document_code}
-                                    </TableCell>
-                                    <TableCell className="text-sm">
-                                        {item.revision || '-'}
-                                    </TableCell>
-                                    <TableCell className="max-w-md truncate">
-                                        {item.title || '-'}
-                                    </TableCell>
-                                    <TableCell className="text-sm">
-                                        {item.document_type || '-'}
-                                    </TableCell>
-                                    <TableCell>
-                                        {getCategoryBadge(item.category)}
-                                    </TableCell>
-                                    <TableCell className="text-sm">
-                                        {item.responsible_email || '-'}
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        <div className="flex justify-end gap-2">
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => setEditItem(item)}
-                                            >
-                                                <Pencil className="h-4 w-4" />
-                                            </Button>
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => setDeleteItem(item)}
-                                            >
-                                                <Trash2 className="h-4 w-4 text-red-600" />
-                                            </Button>
-                                        </div>
-                                    </TableCell>
+            {/* Table Container with Horizontal Scroll */}
+            <div className="rounded-md border bg-white shadow-sm overflow-hidden">
+                <ScrollArea className="w-full whitespace-nowrap">
+                    <div className="min-w-max">
+                        <Table>
+                            <TableHeader className="bg-slate-50">
+                                <TableRow>
+                                    <TableHead className="w-[80px] font-bold text-xs uppercase tracking-wider text-slate-700">Item</TableHead>
+                                    <TableHead className="font-bold text-xs uppercase tracking-wider text-slate-700 min-w-[200px]">Documento N-1710</TableHead>
+                                    <TableHead className="font-bold text-xs uppercase tracking-wider text-slate-700">Revisão</TableHead>
+                                    <TableHead className="font-bold text-xs uppercase tracking-wider text-slate-700 min-w-[300px]">Título</TableHead>
+                                    <TableHead className="font-bold text-xs uppercase tracking-wider text-slate-700">Unidade/Área</TableHead>
+                                    <TableHead className="font-bold text-xs uppercase tracking-wider text-slate-700">Disciplina</TableHead>
+                                    <TableHead className="font-bold text-xs uppercase tracking-wider text-slate-700">Escopo</TableHead>
+                                    <TableHead className="font-bold text-xs uppercase tracking-wider text-slate-700">Propósito de Emissão</TableHead>
+                                    <TableHead className="font-bold text-xs uppercase tracking-wider text-slate-700">Data Prevista</TableHead>
+                                    <TableHead className="font-bold text-xs uppercase tracking-wider text-slate-700">Data Efetiva</TableHead>
+                                    <TableHead className="font-bold text-xs uppercase tracking-wider text-slate-700">N-1710</TableHead>
+                                    <TableHead className="font-bold text-xs uppercase tracking-wider text-slate-700">ISO 9001</TableHead>
+                                    <TableHead className="font-bold text-xs uppercase tracking-wider text-slate-700">GRDT</TableHead>
+                                    <TableHead className="font-bold text-xs uppercase tracking-wider text-slate-700">Status</TableHead>
+                                    <TableHead className="font-bold text-xs uppercase tracking-wider text-slate-700">Para Construção</TableHead>
+                                    <TableHead className="font-bold text-xs uppercase tracking-wider text-slate-700">Rev. Liberada</TableHead>
+                                    <TableHead className="font-bold text-xs uppercase tracking-wider text-slate-700">Emissor</TableHead>
+                                    <TableHead className="font-bold text-xs uppercase tracking-wider text-slate-700">Quem?</TableHead>
+                                    <TableHead className="font-bold text-xs uppercase tracking-wider text-slate-700">Prazo</TableHead>
+                                    <TableHead className="font-bold text-xs uppercase tracking-wider text-slate-700">Status SIGEM</TableHead>
+                                    <TableHead className="font-bold text-xs uppercase tracking-wider text-slate-700 min-w-[200px]">Observações</TableHead>
+                                    <TableHead className="font-bold text-xs uppercase tracking-wider text-slate-700">Taxonomia/Consag</TableHead>
+                                    <TableHead className="font-bold text-xs uppercase tracking-wider text-slate-700">Alocação SIGEM</TableHead>
+                                    <TableHead className="font-bold text-xs uppercase tracking-wider text-slate-700">PW</TableHead>
+                                    <TableHead className="text-right sticky right-0 bg-slate-50 shadow-l-md">Ações</TableHead>
                                 </TableRow>
-                            ))
-                        )}
-                    </TableBody>
-                </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {items.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={25} className="text-center text-gray-500 py-8">
+                                            Nenhum documento encontrado na lista
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    items.map((item, idx) => (
+                                        <TableRow key={item.id} className="hover:bg-slate-50/50">
+                                            <TableCell className="font-mono text-xs text-muted-foreground">{(page - 1) * 50 + idx + 1}</TableCell>
+                                            <TableCell className="font-mono font-medium text-blue-700">{item.document_code}</TableCell>
+                                            <TableCell className="text-center">{item.revision || '-'}</TableCell>
+                                            <TableCell title={item.title || ''}>{item.title || '-'}</TableCell>
+                                            <TableCell>{item.unit || '-'}</TableCell>
+                                            <TableCell>{item.discipline || '-'}</TableCell>
+                                            <TableCell>{item.scope || '-'}</TableCell>
+                                            <TableCell>{item.purpose || '-'}</TableCell>
+                                            <TableCell>{item.expected_delivery_date ? new Date(item.expected_delivery_date).toLocaleDateString('pt-BR') : '-'}</TableCell>
+                                            <TableCell>{item.actual_delivery_date || '-'}</TableCell>
+                                            <TableCell className="text-center">{item.n1710 ? 'Sim' : 'Não'}</TableCell>
+                                            <TableCell className="text-center">{item.iso9001 ? 'Sim' : 'Não'}</TableCell>
+                                            <TableCell>{item.grdt || '-'}</TableCell>
+                                            <TableCell>
+                                                <Badge variant="outline" className="text-xs font-normal">
+                                                    {item.status || 'Pendente'}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell className="text-center">{item.for_construction ? 'Sim' : 'Não'}</TableCell>
+                                            <TableCell className="text-center">{item.released_revision || '-'}</TableCell>
+                                            <TableCell>{item.issuer || '-'}</TableCell>
+                                            <TableCell>{item.who || '-'}</TableCell>
+                                            <TableCell>{item.deadline || '-'}</TableCell>
+                                            <TableCell>{item.status_sigem || '-'}</TableCell>
+                                            <TableCell className="truncate max-w-[200px]" title={item.remarks || ''}>{item.remarks || '-'}</TableCell>
+                                            <TableCell>{item.taxonomy || '-'}</TableCell>
+                                            <TableCell>{item.allocation_sigem || '-'}</TableCell>
+                                            <TableCell>{item.pw || '-'}</TableCell>
+                                            <TableCell className="text-right sticky right-0 bg-white drop-shadow-sm border-l">
+                                                <div className="flex justify-end gap-1 px-2">
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditItem(item)}>
+                                                        <Pencil className="h-4 w-4 text-blue-600" />
+                                                    </Button>
+                                                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setDeleteItem(item)}>
+                                                        <Trash2 className="h-4 w-4 text-red-500" />
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
+                            </TableBody>
+                        </Table>
+                    </div>
+                    <ScrollBar orientation="horizontal" />
+                </ScrollArea>
             </div>
 
             {/* Pagination */}

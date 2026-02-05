@@ -192,10 +192,13 @@ export function ValidationDashboard({ contractId }: ValidationDashboardProps) {
                             />
                         )}
                         {unresolvedCount === 0 && unassignedCount === 0 && (
-                            <div className="flex flex-col items-center justify-center py-6 text-center text-muted-foreground">
-                                <CheckCircle className="h-10 w-10 mb-2 text-green-500" />
-                                <p className="font-medium">Tudo em dia!</p>
-                                <p className="text-sm">Nenhuma ação pendente</p>
+                            <div className="flex flex-col items-center justify-center py-6 text-center text-muted-foreground animate-in fade-in zoom-in duration-500">
+                                <div className="relative">
+                                    <div className="absolute inset-0 bg-green-100 rounded-full animate-ping opacity-75 duration-1000"></div>
+                                    <CheckCircle className="relative h-12 w-12 mb-2 text-green-500 animate-bounce duration-3000" />
+                                </div>
+                                <p className="font-medium text-lg text-green-700">Tudo em dia! 🎉</p>
+                                <p className="text-sm">Você zerou as pendências.</p>
                             </div>
                         )}
                     </CardContent>
@@ -210,18 +213,52 @@ export function ValidationDashboard({ contractId }: ValidationDashboardProps) {
                         <CardDescription>Distribuição por nível de confiança</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="grid grid-cols-3 gap-4 text-center">
-                            <div className="p-4 bg-green-50 rounded-lg">
-                                <p className="text-2xl font-bold text-green-700">{resolutionStats.byConfidence.high}</p>
-                                <p className="text-sm text-green-600">Alta (≥90%)</p>
+                        <div className="space-y-4">
+                            {/* Visual Stacked Bar */}
+                            <div className="flex h-4 w-full rounded-full overflow-hidden bg-gray-100">
+                                <div
+                                    className="bg-green-500 hover:bg-green-600 transition-colors"
+                                    style={{ width: `${(resolutionStats.byConfidence.high / (resolutionStats.total || 1)) * 100}%` }}
+                                    title={`Alta Confiança: ${resolutionStats.byConfidence.high}`}
+                                />
+                                <div
+                                    className="bg-yellow-500 hover:bg-yellow-600 transition-colors"
+                                    style={{ width: `${(resolutionStats.byConfidence.medium / (resolutionStats.total || 1)) * 100}%` }}
+                                    title={`Média Confiança: ${resolutionStats.byConfidence.medium}`}
+                                />
+                                <div
+                                    className="bg-red-500 hover:bg-red-600 transition-colors"
+                                    style={{ width: `${(resolutionStats.byConfidence.low / (resolutionStats.total || 1)) * 100}%` }}
+                                    title={`Baixa Confiança: ${resolutionStats.byConfidence.low}`}
+                                />
                             </div>
-                            <div className="p-4 bg-yellow-50 rounded-lg">
-                                <p className="text-2xl font-bold text-yellow-700">{resolutionStats.byConfidence.medium}</p>
-                                <p className="text-sm text-yellow-600">Média (70-90%)</p>
-                            </div>
-                            <div className="p-4 bg-red-50 rounded-lg">
-                                <p className="text-2xl font-bold text-red-700">{resolutionStats.byConfidence.low}</p>
-                                <p className="text-sm text-red-600">Baixa (&lt;70%)</p>
+
+                            {/* Legend / Stats */}
+                            <div className="grid grid-cols-3 gap-4 text-center">
+                                <div>
+                                    <div className="flex items-center justify-center gap-2 mb-1">
+                                        <div className="w-3 h-3 rounded-full bg-green-500" />
+                                        <span className="text-sm font-medium text-gray-600">Alta</span>
+                                    </div>
+                                    <p className="text-2xl font-bold text-gray-900">{resolutionStats.byConfidence.high}</p>
+                                    <p className="text-xs text-muted-foreground">≥ 90%</p>
+                                </div>
+                                <div>
+                                    <div className="flex items-center justify-center gap-2 mb-1">
+                                        <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                                        <span className="text-sm font-medium text-gray-600">Média</span>
+                                    </div>
+                                    <p className="text-2xl font-bold text-gray-900">{resolutionStats.byConfidence.medium}</p>
+                                    <p className="text-xs text-muted-foreground">70-89%</p>
+                                </div>
+                                <div>
+                                    <div className="flex items-center justify-center gap-2 mb-1">
+                                        <div className="w-3 h-3 rounded-full bg-red-500" />
+                                        <span className="text-sm font-medium text-gray-600">Baixa</span>
+                                    </div>
+                                    <p className="text-2xl font-bold text-gray-900">{resolutionStats.byConfidence.low}</p>
+                                    <p className="text-xs text-muted-foreground">&lt; 70%</p>
+                                </div>
                             </div>
                         </div>
                     </CardContent>
@@ -268,7 +305,9 @@ function StatCard({
                         <p className="text-sm font-medium">{label}</p>
                         <p className="text-xs opacity-70">{subtitle}</p>
                     </div>
-                    <Icon className="h-8 w-8 opacity-50" />
+                    <div className="p-2 bg-white/50 rounded-lg">
+                        <Icon className="h-6 w-6" />
+                    </div>
                 </div>
             </CardContent>
         </Card>

@@ -28,7 +28,7 @@ export interface Company {
     logo_url: string | null;
     created_at: string;
     updated_at: string;
-    settings: Record<string, any>;
+    settings: Record<string, unknown>;
 }
 
 export interface Contract {
@@ -42,7 +42,7 @@ export interface Contract {
     ended_at: string | null;
     created_at: string;
     updated_at: string;
-    metadata: Record<string, any>;
+    metadata: Record<string, unknown>;
 }
 
 export interface User {
@@ -81,7 +81,7 @@ export interface ManifestItem {
     category: string | null;
     expected_delivery_date: string | null;
     responsible_email: string | null;
-    metadata: Record<string, any>;
+    metadata: Record<string, unknown>;
     created_at: string;
     updated_at: string;
 }
@@ -101,7 +101,7 @@ export interface ValidatedDocument {
     grd_number: string | null;
     batch_id: string | null;
     error_message: string | null;
-    error_details: Record<string, any> | null;
+    error_details: Record<string, unknown> | null;
     confidence?: number;
     matched_document_code?: string;
     created_at: string;
@@ -115,7 +115,7 @@ export interface AuditLog {
     resource_type: string;
     resource_id: string | null;
     contract_id: string | null;
-    changes: Record<string, any> | null;
+    changes: Record<string, unknown> | null;
     ip_address: string | null;
     user_agent: string | null;
     timestamp: string;

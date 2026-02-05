@@ -1,0 +1,415 @@
+
+> doc-flow-web@0.1.0 test
+> vitest
+
+
+[1m[44m DEV [49m[22m [34mv4.0.18 [39m[90mC:/Development/doc-flow/doc-flow-web[39m
+
+ [31mÔØ»[39m __tests__/unit/extraction-service.test.ts [2m([22m[2m5 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 6[2mms[22m[39m
+[31m       [31m├ù[31m should extract simple code pattern[39m[32m 3[2mms[22m[39m
+[31m       [31m├ù[31m should extract code with revision[39m[32m 0[2mms[22m[39m
+       [32mÔ£ô[39m should return undefined if no pattern matches[32m 0[2mms[22m[39m
+       [32mÔ£ô[39m should return 1 for identical strings[32m 0[2mms[22m[39m
+       [32mÔ£ô[39m should return high score for minor differences[32m 0[2mms[22m[39m
+ [32mÔ£ô[39m __tests__/unit/batch-service.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 3[2mms[22m[39m
+ [31mÔØ»[39m __tests__/unit/resolution-service.test.ts [2m([22m[2m2 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 4[2mms[22m[39m
+[31m       [31m├ù[31m should return candidates ordered by similarity[39m[32m 3[2mms[22m[39m
+       [32mÔ£ô[39m should exist[32m 0[2mms[22m[39m
+ [31mÔØ»[39m __tests__/unit/validation-service.test.ts [2m([22m[2m4 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 7[2mms[22m[39m
+[31m     [31m├ù[31m should normalize code by removing extension and revision[39m[32m 4[2mms[22m[39m
+       [32mÔ£ô[39m should validate accepted extensions[32m 0[2mms[22m[39m
+[31m       [31m├ù[31m should detect revision suffixes[39m[32m 1[2mms[22m[39m
+       [32mÔ£ô[39m should return filename without extension[32m 0[2mms[22m[39m
+ [32mÔ£ô[39m __tests__/components/create-batch-dialog.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 226[2mms[22m[39m
+ [31mÔØ»[39m e2e/validation-flow.spec.ts [2m([22m[2m0 test[22m[2m)[22m
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ» Failed Suites 1 ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+
+ FAIL  e2e/validation-flow.spec.ts [ e2e/validation-flow.spec.ts ]
+Error: Playwright Test did not expect test.describe() to be called here.
+Most common reasons include:
+- You are calling test.describe() in a configuration file.
+- You are calling test.describe() in a file that is imported by the configuration file.
+- You have two different versions of @playwright/test. This usually happens
+  when one of the dependencies in your package.json depends on @playwright/test.
+ ÔØ» TestTypeImpl._currentSuite node_modules/playwright/lib/common/testType.js:75:13
+ ÔØ» TestTypeImpl._describe node_modules/playwright/lib/common/testType.js:115:24
+ ÔØ» Function.describe node_modules/playwright/lib/transform/transform.js:282:12
+ ÔØ» e2e/validation-flow.spec.ts:4:6
+      2| import path from 'path';
+      3| 
+      4| test.describe('Validation Flow', () => {
+       |      ^
+      5|     test.beforeEach(async ({ page }) => {
+      6|         // As we don't have a real auth setup in this test env yet, 
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/6]ÔÄ»
+
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ» Failed Tests 5 ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+
+ FAIL  __tests__/unit/extraction-service.test.ts > ExtractionService > extractDocumentCode > should extract simple code pattern
+TypeError: Cannot read properties of undefined (reading 'toUpperCase')
+ ÔØ» ExtractionService.extractDocumentCode lib/validator/services/extraction-service.ts:194:33
+    192|             const match = filename.match(pattern);
+    193|             if (match) {
+    194|                 return match[1].toUpperCase();
+       |                                 ^
+    195|             }
+    196|         }
+ ÔØ» __tests__/unit/extraction-service.test.ts:10:34
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[2/6]ÔÄ»
+
+ FAIL  __tests__/unit/extraction-service.test.ts > ExtractionService > extractDocumentCode > should extract code with revision
+TypeError: Cannot read properties of undefined (reading 'toUpperCase')
+ ÔØ» ExtractionService.extractDocumentCode lib/validator/services/extraction-service.ts:194:33
+    192|             const match = filename.match(pattern);
+    193|             if (match) {
+    194|                 return match[1].toUpperCase();
+       |                                 ^
+    195|             }
+    196|         }
+ ÔØ» __tests__/unit/extraction-service.test.ts:15:34
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[3/6]ÔÄ»
+
+ FAIL  __tests__/unit/resolution-service.test.ts > ResolutionService > getCandidates > should return candidates ordered by similarity
+TypeError: Cannot read properties of undefined (reading 'select')
+ ÔØ» ResolutionService.getCandidates lib/validator/services/resolution-service.ts:118:40
+    116|         // Buscar documento para sugest├Áes smart (comportamento originÔÇª
+    117|         const { data: doc } = await supabase
+    118|             .from('validated_documents')
+       |                                        ^
+    119|             .select('*')
+    120|             .eq('id', documentId)
+ ÔØ» __tests__/unit/resolution-service.test.ts:38:32
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[4/6]ÔÄ»
+
+ FAIL  __tests__/unit/validation-service.test.ts > ValidationService Helpers > should normalize code by removing extension and revision
+AssertionError: expected 'DOC-001_REVA' to be 'DOC-001' // Object.is equality
+
+Expected: "DOC-001"
+Received: "DOC-001_REVA"
+
+ ÔØ» __tests__/unit/validation-service.test.ts:15:59
+     13|         // DOC-001_RevA.pdf -> DOC-001_RevA -> DOC-001
+     14|         expect(normalizeDocumentCode('DOC-001.pdf')).toBe('DOC-001');
+     15|         expect(normalizeDocumentCode('DOC-001_RevA.pdf')).toBe('DOC-00ÔÇª
+       |                                                           ^
+     16|         expect(normalizeDocumentCode('doc-001.pdf')).toBe('DOC-001');
+     17|     });
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[5/6]ÔÄ»
+
+ FAIL  __tests__/unit/validation-service.test.ts > ValidationService Helpers > hasRevisionSuffix > should detect revision suffixes
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ÔØ» __tests__/unit/validation-service.test.ts:29:59
+     27|     describe('hasRevisionSuffix', () => {
+     28|         it('should detect revision suffixes', () => {
+     29|             expect(hasRevisionSuffix('DOC-001_RevA.pdf')).toBe(true);
+       |                                                           ^
+     30|             expect(hasRevisionSuffix('DOC-001-01.pdf')).toBe(true);
+     31|             expect(hasRevisionSuffix('DOC-001.pdf')).toBe(false);
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[6/6]ÔÄ»
+
+
+[2m Test Files [22m [1m[31m4 failed[39m[22m[2m | [22m[1m[32m2 passed[39m[22m[90m (6)[39m
+[2m      Tests [22m [1m[31m5 failed[39m[22m[2m | [22m[1m[32m11 passed[39m[22m[90m (16)[39m
+[2m   Start at [22m 09:56:08
+[2m   Duration [22m 16.56s[2m (transform 1.49s, setup 9.64s, import 3.87s, tests 247ms, environment 33.89s)[22m
+
+[1m[41m FAIL [49m[22m [31mTests failed. Watching for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2mlib/validator/services/validation-service.ts [22m[34mx1 [34m[39m
+
+ [31mÔØ»[39m __tests__/unit/resolution-service.test.ts [2m([22m[2m2 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 4[2mms[22m[39m
+[31m       [31m├ù[31m should return candidates ordered by similarity[39m[32m 3[2mms[22m[39m
+       [32mÔ£ô[39m should exist[32m 0[2mms[22m[39m
+ [31mÔØ»[39m e2e/validation-flow.spec.ts [2m([22m[2m0 test[22m[2m)[22m
+ [31mÔØ»[39m __tests__/unit/extraction-service.test.ts [2m([22m[2m5 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 6[2mms[22m[39m
+[31m       [31m├ù[31m should extract simple code pattern[39m[32m 3[2mms[22m[39m
+[31m       [31m├ù[31m should extract code with revision[39m[32m 0[2mms[22m[39m
+       [32mÔ£ô[39m should return undefined if no pattern matches[32m 0[2mms[22m[39m
+       [32mÔ£ô[39m should return 1 for identical strings[32m 0[2mms[22m[39m
+       [32mÔ£ô[39m should return high score for minor differences[32m 0[2mms[22m[39m
+ [32mÔ£ô[39m __tests__/unit/validation-service.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 3[2mms[22m[39m
+
+[2m Test Files [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (4)[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m8 passed[39m[22m[90m (11)[39m
+[2m   Start at [22m 09:57:02
+[2m   Duration [22m 2.18s
+
+[1m[42m PASS [49m[22m [32mWaiting for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2m__tests__/unit/resolution-service.test.ts [22m[34mx1 [34m[39m
+
+ [31mÔØ»[39m e2e/validation-flow.spec.ts [2m([22m[2m0 test[22m[2m)[22m
+ [31mÔØ»[39m __tests__/unit/extraction-service.test.ts [2m([22m[2m5 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 6[2mms[22m[39m
+[31m       [31m├ù[31m should extract simple code pattern[39m[32m 3[2mms[22m[39m
+[31m       [31m├ù[31m should extract code with revision[39m[32m 0[2mms[22m[39m
+       [32mÔ£ô[39m should return undefined if no pattern matches[32m 0[2mms[22m[39m
+       [32mÔ£ô[39m should return 1 for identical strings[32m 0[2mms[22m[39m
+       [32mÔ£ô[39m should return high score for minor differences[32m 0[2mms[22m[39m
+ [31mÔØ»[39m __tests__/unit/resolution-service.test.ts [2m([22m[2m2 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 4[2mms[22m[39m
+[31m       [31m├ù[31m should return candidates ordered by similarity[39m[32m 3[2mms[22m[39m
+       [32mÔ£ô[39m should exist[32m 0[2mms[22m[39m
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ» Failed Tests 1 ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+
+ FAIL  __tests__/unit/resolution-service.test.ts > ResolutionService > getCandidates > should return candidates ordered by similarity
+TypeError: Cannot read properties of undefined (reading 'select')
+ ÔØ» ResolutionService.getCandidates lib/validator/services/resolution-service.ts:118:40
+    116|         // Buscar documento para sugest├Áes smart (comportamento originÔÇª
+    117|         const { data: doc } = await supabase
+    118|             .from('validated_documents')
+       |                                        ^
+    119|             .select('*')
+    120|             .eq('id', documentId)
+ ÔØ» __tests__/unit/resolution-service.test.ts:38:32
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/1]ÔÄ»
+
+
+[2m Test Files [22m [1m[31m3 failed[39m[22m[90m (3)[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m4 passed[39m[22m[90m (7)[39m
+[2m   Start at [22m 09:57:11
+[2m   Duration [22m 941ms
+
+[1m[41m FAIL [49m[22m [31mTests failed. Watching for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2mlib/validator/services/extraction-service.ts [22m[39m
+
+ [31mÔØ»[39m e2e/validation-flow.spec.ts [2m([22m[2m0 test[22m[2m)[22m
+ [31mÔØ»[39m __tests__/unit/resolution-service.test.ts [2m([22m[2m2 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 6[2mms[22m[39m
+[31m       [31m├ù[31m should return candidates ordered by similarity[39m[32m 4[2mms[22m[39m
+       [32mÔ£ô[39m should exist[32m 1[2mms[22m[39m
+ [31mÔØ»[39m __tests__/unit/extraction-service.test.ts [2m([22m[2m5 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 9[2mms[22m[39m
+[31m       [31m├ù[31m should extract simple code pattern[39m[32m 5[2mms[22m[39m
+[31m       [31m├ù[31m should extract code with revision[39m[32m 1[2mms[22m[39m
+       [32mÔ£ô[39m should return undefined if no pattern matches[32m 1[2mms[22m[39m
+       [32mÔ£ô[39m should return 1 for identical strings[32m 0[2mms[22m[39m
+       [32mÔ£ô[39m should return high score for minor differences[32m 0[2mms[22m[39m
+ [32mÔ£ô[39m __tests__/unit/validation-service.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 3[2mms[22m[39m
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ» Failed Tests 3 ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+
+ FAIL  __tests__/unit/resolution-service.test.ts > ResolutionService > getCandidates > should return candidates ordered by similarity
+TypeError: Cannot read properties of undefined (reading 'select')
+ ÔØ» ResolutionService.getCandidates lib/validator/services/resolution-service.ts:118:40
+    116|         // Buscar documento para sugest├Áes smart (comportamento originÔÇª
+    117|         const { data: doc } = await supabase
+    118|             .from('validated_documents')
+       |                                        ^
+    119|             .select('*')
+    120|             .eq('id', documentId)
+ ÔØ» __tests__/unit/resolution-service.test.ts:38:32
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/3]ÔÄ»
+
+ FAIL  __tests__/unit/extraction-service.test.ts > ExtractionService > extractDocumentCode > should extract simple code pattern
+TypeError: Cannot read properties of undefined (reading 'toUpperCase')
+ ÔØ» ExtractionService.extractDocumentCode lib/validator/services/extraction-service.ts:194:33
+    192|             const match = filename.match(pattern);
+    193|             if (match) {
+    194|                 return match[1].toUpperCase();
+       |                                 ^
+    195|             }
+    196|         }
+ ÔØ» __tests__/unit/extraction-service.test.ts:10:34
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[2/3]ÔÄ»
+
+ FAIL  __tests__/unit/extraction-service.test.ts > ExtractionService > extractDocumentCode > should extract code with revision
+TypeError: Cannot read properties of undefined (reading 'toUpperCase')
+ ÔØ» ExtractionService.extractDocumentCode lib/validator/services/extraction-service.ts:194:33
+    192|             const match = filename.match(pattern);
+    193|             if (match) {
+    194|                 return match[1].toUpperCase();
+       |                                 ^
+    195|             }
+    196|         }
+ ÔØ» __tests__/unit/extraction-service.test.ts:15:34
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[3/3]ÔÄ»
+
+
+[2m Test Files [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (4)[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m8 passed[39m[22m[90m (11)[39m
+[2m   Start at [22m 09:58:19
+[2m   Duration [22m 3.30s
+
+[1m[41m FAIL [49m[22m [31mTests failed. Watching for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2mlib/validator/services/extraction-service.ts [22m[39m
+
+ [31mÔØ»[39m e2e/validation-flow.spec.ts [2m([22m[2m0 test[22m[2m)[22m
+ [31mÔØ»[39m __tests__/unit/extraction-service.test.ts [2m([22m[2m5 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 8[2mms[22m[39m
+[31m       [31m├ù[31m should extract simple code pattern[39m[32m 4[2mms[22m[39m
+[31m       [31m├ù[31m should extract code with revision[39m[32m 0[2mms[22m[39m
+       [32mÔ£ô[39m should return undefined if no pattern matches[32m 1[2mms[22m[39m
+       [32mÔ£ô[39m should return 1 for identical strings[32m 0[2mms[22m[39m
+       [32mÔ£ô[39m should return high score for minor differences[32m 0[2mms[22m[39m
+ [32mÔ£ô[39m __tests__/unit/validation-service.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 3[2mms[22m[39m
+ [31mÔØ»[39m __tests__/unit/resolution-service.test.ts [2m([22m[2m2 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 5[2mms[22m[39m
+[31m       [31m├ù[31m should return candidates ordered by similarity[39m[32m 3[2mms[22m[39m
+       [32mÔ£ô[39m should exist[32m 0[2mms[22m[39m
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ» Failed Tests 3 ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+
+ FAIL  __tests__/unit/resolution-service.test.ts > ResolutionService > getCandidates > should return candidates ordered by similarity
+TypeError: Cannot read properties of undefined (reading 'select')
+ ÔØ» ResolutionService.getCandidates lib/validator/services/resolution-service.ts:118:40
+    116|         // Buscar documento para sugest├Áes smart (comportamento originÔÇª
+    117|         const { data: doc } = await supabase
+    118|             .from('validated_documents')
+       |                                        ^
+    119|             .select('*')
+    120|             .eq('id', documentId)
+ ÔØ» __tests__/unit/resolution-service.test.ts:38:32
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/3]ÔÄ»
+
+ FAIL  __tests__/unit/extraction-service.test.ts > ExtractionService > extractDocumentCode > should extract simple code pattern
+TypeError: Cannot read properties of undefined (reading 'toUpperCase')
+ ÔØ» ExtractionService.extractDocumentCode lib/validator/services/extraction-service.ts:194:33
+    192|             const match = filename.match(pattern);
+    193|             if (match) {
+    194|                 return match[1].toUpperCase();
+       |                                 ^
+    195|             }
+    196|         }
+ ÔØ» __tests__/unit/extraction-service.test.ts:10:34
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[2/3]ÔÄ»
+
+ FAIL  __tests__/unit/extraction-service.test.ts > ExtractionService > extractDocumentCode > should extract code with revision
+TypeError: Cannot read properties of undefined (reading 'toUpperCase')
+ ÔØ» ExtractionService.extractDocumentCode lib/validator/services/extraction-service.ts:194:33
+    192|             const match = filename.match(pattern);
+    193|             if (match) {
+    194|                 return match[1].toUpperCase();
+       |                                 ^
+    195|             }
+    196|         }
+ ÔØ» __tests__/unit/extraction-service.test.ts:15:34
+
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[3/3]ÔÄ»
+
+[2m Test Files [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (4)[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m8 passed[39m[22m[90m (11)[39m
+[2m   Start at [22m 09:58:25
+[2m   Duration [22m 3.66s
+
+[1m[41m FAIL [49m[22m [31mTests failed. Watching for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2mlib/validator/services/extraction-service.ts [22m[39m
+
+ [31mÔØ»[39m e2e/validation-flow.spec.ts [2m([22m[2m0 test[22m[2m)[22m
+ [31mÔØ»[39m __tests__/unit/extraction-service.test.ts [2m([22m[2m5 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 7[2mms[22m[39m
+[31m       [31m├ù[31m should extract simple code pattern[39m[32m 3[2mms[22m[39m
+[31m       [31m├ù[31m should extract code with revision[39m[32m 0[2mms[22m[39m
+       [32mÔ£ô[39m should return undefined if no pattern matches[32m 1[2mms[22m[39m
+       [32mÔ£ô[39m should return 1 for identical strings[32m 0[2mms[22m[39m
+       [32mÔ£ô[39m should return high score for minor differences[32m 0[2mms[22m[39m
+ [32mÔ£ô[39m __tests__/unit/validation-service.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 3[2mms[22m[39m
+ [31mÔØ»[39m __tests__/unit/resolution-service.test.ts [2m([22m[2m2 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 5[2mms[22m[39m
+[31m       [31m├ù[31m should return candidates ordered by similarity[39m[32m 3[2mms[22m[39m
+       [32mÔ£ô[39m should exist[32m 0[2mms[22m[39m
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ» Failed Tests 3 ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+
+ FAIL  __tests__/unit/resolution-service.test.ts > ResolutionService > getCandidates > should return candidates ordered by similarity
+TypeError: supabase.from(...).select(...).eq(...).single is not a function
+ ÔØ» ResolutionService.getCandidates lib/validator/services/resolution-service.ts:121:14
+    119|             .select('*')
+    120|             .eq('id', documentId)
+    121|             .single();
+       |              ^
+    122| 
+    123|         if (!doc) {
+ ÔØ» __tests__/unit/resolution-service.test.ts:41:32
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/3]ÔÄ»
+
+ FAIL  __tests__/unit/extraction-service.test.ts > ExtractionService > extractDocumentCode > should extract simple code pattern
+TypeError: Cannot read properties of undefined (reading 'toUpperCase')
+ ÔØ» ExtractionService.extractDocumentCode lib/validator/services/extraction-service.ts:194:33
+    192|             const match = filename.match(pattern);
+    193|             if (match) {
+    194|                 return match[1].toUpperCase();
+       |                                 ^
+    195|             }
+    196|         }
+ ÔØ» __tests__/unit/extraction-service.test.ts:10:34
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[2/3]ÔÄ»
+
+ FAIL  __tests__/unit/extraction-service.test.ts > ExtractionService > extractDocumentCode > should extract code with revision
+TypeError: Cannot read properties of undefined (reading 'toUpperCase')
+ ÔØ» ExtractionService.extractDocumentCode lib/validator/services/extraction-service.ts:194:33
+    192|             const match = filename.match(pattern);
+    193|             if (match) {
+    194|                 return match[1].toUpperCase();
+       |                                 ^
+    195|             }
+    196|         }
+ ÔØ» __tests__/unit/extraction-service.test.ts:15:34
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[3/3]ÔÄ»
+
+
+[2m Test Files [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m1 passed[39m[22m[90m (4)[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m8 passed[39m[22m[90m (11)[39m
+[2m   Start at [22m 10:00:00
+[2m   Duration [22m 3.19s
+
+[1m[41m FAIL [49m[22m [31mTests failed. Watching for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+c[3J[1m[44m RERUN [49m[22m [34m[2m__tests__/unit/resolution-service.test.ts [22m[34mx5 [34m[39m
+
+ [31mÔØ»[39m e2e/validation-flow.spec.ts [2m([22m[2m0 test[22m[2m)[22m
+ [31mÔØ»[39m __tests__/unit/extraction-service.test.ts [2m([22m[2m5 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 7[2mms[22m[39m
+[31m       [31m├ù[31m should extract simple code pattern[39m[32m 3[2mms[22m[39m
+[31m       [31m├ù[31m should extract code with revision[39m[32m 0[2mms[22m[39m
+       [32mÔ£ô[39m should return undefined if no pattern matches[32m 1[2mms[22m[39m
+       [32mÔ£ô[39m should return 1 for identical strings[32m 0[2mms[22m[39m
+       [32mÔ£ô[39m should return high score for minor differences[32m 0[2mms[22m[39m
+ [31mÔØ»[39m __tests__/unit/resolution-service.test.ts [2m([22m[2m2 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 4[2mms[22m[39m
+[31m       [31m├ù[31m should return candidates ordered by similarity[39m[32m 3[2mms[22m[39m
+       [32mÔ£ô[39m should exist[32m 0[2mms[22m[39m
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ» Failed Tests 1 ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»
+
+ FAIL  __tests__/unit/resolution-service.test.ts > ResolutionService > getCandidates > should return candidates ordered by similarity
+TypeError: supabase.from(...).select(...).eq(...).single is not a function
+ ÔØ» ResolutionService.getCandidates lib/validator/services/resolution-service.ts:121:14
+    119|             .select('*')
+    120|             .eq('id', documentId)
+    121|             .single();
+       |              ^
+    122| 
+    123|         if (!doc) {
+ ÔØ» __tests__/unit/resolution-service.test.ts:41:32
+
+ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/1]ÔÄ»
+
+
+[2m Test Files [22m [1m[31m3 failed[39m[22m[90m (3)[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m4 passed[39m[22m[90m (7)[39m
+[2m   Start at [22m 10:00:05
+[2m   Duration [22m 936ms
+
+[1m[41m FAIL [49m[22m [31mTests failed. Watching for file changes...[39m
+       [2mpress [22m[1mh[22m[2m to show help[22m[2m, [22m[2mpress [22m[1mq[22m[2m to quit[22m
+^C
