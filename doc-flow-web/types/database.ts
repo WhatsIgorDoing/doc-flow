@@ -82,6 +82,8 @@ export interface ManifestItem {
     expected_delivery_date: string | null;
     responsible_email: string | null;
     metadata: Record<string, unknown>;
+    discipline: 'quality' | 'commissioning' | 'cv' | null;
+    original_sheet_name: string | null;
     created_at: string;
     updated_at: string;
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
     Table,
     TableBody,
@@ -13,9 +13,10 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Pencil, Trash2, Search } from 'lucide-react';
+import { Pencil, Trash2, Search, FileSpreadsheet } from 'lucide-react';
 import { ManifestItemDialog } from './ManifestItemDialog';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
+import { ExcelImportSheet } from './ExcelImportSheet';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 interface ManifestItem {
@@ -69,15 +70,22 @@ async function fetchManifest(contractId: string, page: number, search: string) {
 }
 
 export function ManifestTable({ contractId }: ManifestTableProps) {
+    const queryClient = useQueryClient();
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState('');
     const [editItem, setEditItem] = useState<ManifestItem | null>(null);
     const [deleteItem, setDeleteItem] = useState<ManifestItem | null>(null);
+    const [isImportOpen, setIsImportOpen] = useState(false);
 
     const { data, isLoading, error } = useQuery({
         queryKey: ['manifest', contractId, page, search],
         queryFn: () => fetchManifest(contractId, page, search)
     });
+
+    const handleImportComplete = () => {
+        queryClient.invalidateQueries({ queryKey: ['manifest'] });
+        setIsImportOpen(false);
+    };
 
     if (isLoading) {
         return <div className="text-center py-8">Carregando...</div>;
@@ -97,7 +105,7 @@ export function ManifestTable({ contractId }: ManifestTableProps) {
     return (
         <div className="space-y-4">
             {/* Toolbar */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 justify-between">
                 <div className="relative flex-1 max-w-sm">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -110,6 +118,10 @@ export function ManifestTable({ contractId }: ManifestTableProps) {
                         className="pl-9"
                     />
                 </div>
+                <Button variant="outline" onClick={() => setIsImportOpen(true)} className="gap-2">
+                    <FileSpreadsheet className="h-4 w-4 text-green-600" />
+                    Importar Excel
+                </Button>
             </div>
 
             {/* Table Container with Horizontal Scroll */}
@@ -249,6 +261,13 @@ export function ManifestTable({ contractId }: ManifestTableProps) {
                     onOpenChange={(open) => !open && setDeleteItem(null)}
                 />
             )}
+
+            <ExcelImportSheet
+                open={isImportOpen}
+                onOpenChange={setIsImportOpen}
+                contractId={contractId}
+                onImportComplete={handleImportComplete}
+            />
         </div>
     );
 }
