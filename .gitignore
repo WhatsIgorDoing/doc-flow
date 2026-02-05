@@ -45,8 +45,7 @@ wheels/
 pip-wheel-metadata/
 
 # Documentation Build Artifacts
-docs/_build/
-*.pdf
+
 
 # Logs
 *.log
