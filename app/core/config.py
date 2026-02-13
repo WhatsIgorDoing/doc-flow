@@ -16,7 +16,9 @@ class Settings(BaseSettings):
     APP_VERSION: str = "2.0.0"
     ENVIRONMENT: str = "development"
     DEBUG: bool = False
-    SECRET_KEY: str = ""  # OBRIGATÓRIO: Definir via .env (gerar com: python -c "import secrets; print(secrets.token_urlsafe(32))")
+    SECRET_KEY: str = (
+        ""  # OBRIGATÓRIO: Definir via .env (gerar com: python -c "import secrets; print(secrets.token_urlsafe(32))")
+    )
 
     # Database
     DATABASE_PATH: str = "./data/sad_app.db"

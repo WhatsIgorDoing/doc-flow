@@ -49,7 +49,9 @@ class Shadows:
 class Typography:
     """Font setup (using System UI / Inter)."""
 
-    font_family: str = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
+    font_family: str = (
+        '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
+    )
 
     # Sizes
     h1: str = "text-5xl font-semibold tracking-tight"
