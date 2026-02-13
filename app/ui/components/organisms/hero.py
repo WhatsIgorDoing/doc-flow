@@ -1,7 +1,8 @@
 from nicegui import ui
-from app.ui.theme.design_system import design
-from app.ui.components.molecules.status_pill import StatusPill
+
 from app.core.config import settings
+from app.ui.components.molecules.status_pill import StatusPill
+from app.ui.theme.design_system import design
 
 
 def HeroHeader():

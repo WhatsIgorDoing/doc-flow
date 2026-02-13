@@ -3,8 +3,8 @@ Script de inicialização da aplicação.
 Garante que o diretório raiz esteja no PYTHONPATH.
 """
 
-import sys
 import os
+import sys
 from pathlib import Path
 
 # Adiciona o diretório raiz ao PYTHONPATH
