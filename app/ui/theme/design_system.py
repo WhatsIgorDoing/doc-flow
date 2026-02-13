@@ -4,6 +4,35 @@ Centralizes colors, shadows, typography, and spacing.
 """
 
 from dataclasses import dataclass
+from typing import Tuple
+
+
+@dataclass
+class DesignTokens:
+    """Responsive Design Breakpoints."""
+
+    BREAKPOINTS = {
+        "small": 640,
+        "medium": 768,
+        "large": 1024,
+        "xlarge": 1280,
+        "2xlarge": 1536,
+    }
+
+
+class ResponsiveLayout:
+    @staticmethod
+    def get_window_size(screen_width: int, screen_height: int) -> Tuple[int, int]:
+        """Calcula tamanho ideal da janela baseado na tela."""
+        width = int(screen_width * 0.9)
+        height = int(screen_height * 0.9)
+
+        if screen_width >= DesignTokens.BREAKPOINTS["xlarge"]:
+            # Tela muito grande - usa 70% da largura
+            width = int(screen_width * 0.7)
+            height = int(screen_height * 0.8)
+
+        return width, height
 
 
 @dataclass
