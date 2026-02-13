@@ -15,7 +15,6 @@ class ValidateBatchUseCase:
     # Padrões de sufixos de revisão típicos (RN-NEW-001) pre-compilados para performance
     _REVISION_PATTERNS = [
         re.compile(r"_[A-Z]$", re.IGNORECASE),  # _A, _B, _C, etc.
-        re.compile(r"_Rev\d+$", re.IGNORECASE),  # _Rev0, _Rev1, _Rev2, etc.
         re.compile(r"_rev\d+$", re.IGNORECASE),  # _rev0, _rev1, _rev2, etc.
         re.compile(r"_\d+$", re.IGNORECASE),  # _0, _1, _2, etc.
         re.compile(r"_final$", re.IGNORECASE),  # _final
