@@ -21,6 +21,7 @@ from app.domain.exceptions import (
 
 # ===== Interfaces (Protocols) =====
 
+
 class IManifestRepository(Protocol):
     """Contrato para um repositório que lê dados de um manifesto."""
 

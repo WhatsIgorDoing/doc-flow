@@ -38,11 +38,11 @@ class OpenpyxlTemplateFiller(ITemplateFiller):
         Executa operações pesadas de Excel em thread pool.
         """
         if not template_path.exists():
-            app_logger.error(
-                "Template not found", extra={"path": str(template_path)}
-            )
+            app_logger.error("Template not found", extra={"path": str(template_path)})
             # Levanta a exceção diretamente para ser tratada acima
-            raise TemplateNotFoundError(f"Arquivo template não encontrado: {template_path}")
+            raise TemplateNotFoundError(
+                f"Arquivo template não encontrado: {template_path}"
+            )
 
         try:
             # 1. Copia o template para o local de saída (async)
@@ -53,10 +53,10 @@ class OpenpyxlTemplateFiller(ITemplateFiller):
             await loop.run_in_executor(
                 None, self._fill_workbook_sync, output_path, data
             )
-            
+
             app_logger.info(
                 "Template filled successfully",
-                extra={"output_path": str(output_path), "groups_count": len(data)}
+                extra={"output_path": str(output_path), "groups_count": len(data)},
             )
 
         except (TemplateNotFoundError, TemplateFillError):
@@ -68,9 +68,7 @@ class OpenpyxlTemplateFiller(ITemplateFiller):
             )
             raise TemplateFillError(f"Falha ao preencher o template {output_path}: {e}")
 
-    def _fill_workbook_sync(
-        self, output_path: Path, data: List[DocumentGroup]
-    ) -> None:
+    def _fill_workbook_sync(self, output_path: Path, data: List[DocumentGroup]) -> None:
         """Lógica síncrona de preenchimento do Excel."""
         workbook = openpyxl.load_workbook(output_path)
         sheet: Worksheet = workbook.active
@@ -113,7 +111,7 @@ class OpenpyxlTemplateFiller(ITemplateFiller):
         if all_rows_data:
             # Insere linhas
             if len(all_rows_data) > 0:
-                 sheet.insert_rows(insert_row, amount=len(all_rows_data))
+                sheet.insert_rows(insert_row, amount=len(all_rows_data))
 
             # Preenche dados
             for i, row_data in enumerate(all_rows_data):
@@ -127,10 +125,12 @@ class OpenpyxlTemplateFiller(ITemplateFiller):
         workbook.save(output_path)
         workbook.close()
 
-    def _apply_formatting(self, sheet: Worksheet, data_start_row: int, num_data_rows: int):
+    def _apply_formatting(
+        self, sheet: Worksheet, data_start_row: int, num_data_rows: int
+    ):
         """Aplica formatação básica."""
         num_columns = 9
-        
+
         # Helper para borda fina
         thin_border = Border(
             left=Side(style="thin"),
@@ -138,9 +138,11 @@ class OpenpyxlTemplateFiller(ITemplateFiller):
             top=Side(style="thin"),
             bottom=Side(style="thin"),
         )
-        
+
         # Cabeçalho (amarelo)
-        header_fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")
+        header_fill = PatternFill(
+            start_color="FFFF00", end_color="FFFF00", fill_type="solid"
+        )
         for col in range(1, num_columns + 1):
             cell = sheet.cell(row=1, column=col)
             cell.fill = header_fill
@@ -156,6 +158,16 @@ class OpenpyxlTemplateFiller(ITemplateFiller):
                 cell.alignment = Alignment(horizontal="left", vertical="center")
 
         # Ajustar larguras
-        widths = {'A': 35, 'B': 10, 'C': 60, 'D': 35, 'E': 10, 'F': 20, 'G': 20, 'H': 20, 'I': 20}
+        widths = {
+            "A": 35,
+            "B": 10,
+            "C": 60,
+            "D": 35,
+            "E": 10,
+            "F": 20,
+            "G": 20,
+            "H": 20,
+            "I": 20,
+        }
         for col_letter, width in widths.items():
             sheet.column_dimensions[col_letter].width = width

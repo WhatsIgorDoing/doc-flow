@@ -43,14 +43,14 @@ class ResolveExceptionUseCase:
         Limpa um código extraído para corresponder ao padrão do manifesto.
         """
         # Remove sufixos de revisão (ex: _A, _0, etc.)
-        sanitized = re.sub(r'_[A-Z0-9]$', '', code, flags=re.IGNORECASE)
+        sanitized = re.sub(r"_[A-Z0-9]$", "", code, flags=re.IGNORECASE)
         return sanitized.strip()
 
     async def execute(
         self,
         file_to_resolve: DocumentFile,
         profile_id: str,
-        all_manifest_items: List[ManifestItem]
+        all_manifest_items: List[ManifestItem],
     ) -> DocumentFile:
         """
         Executa o fluxo de resolução para um único arquivo.
@@ -72,12 +72,14 @@ class ResolveExceptionUseCase:
                 "Iniciando resolução de exceção",
                 extra={
                     "document_filename": file_to_resolve.path.name,
-                    "profile_id": profile_id
-                }
+                    "profile_id": profile_id,
+                },
             )
 
             # 1. Extração de Conteúdo (IO Bound - Async)
-            text = await self._content_extractor.extract_text(file_to_resolve, profile_id)
+            text = await self._content_extractor.extract_text(
+                file_to_resolve, profile_id
+            )
 
             # 2. Extração de Código (CPU Bound - pode ser síncrono ou async, assumindo async pela interface)
             found_code = await self._code_extractor.find_code(text, profile_id)
@@ -97,11 +99,11 @@ class ResolveExceptionUseCase:
             matched_item = manifest_map.get(sanitized_code)
 
             if not matched_item:
-                 app_logger.warning(
+                app_logger.warning(
                     "Código encontrado mas não consta no manifesto",
-                    extra={"code": sanitized_code}
+                    extra={"code": sanitized_code},
                 )
-                 raise CodeNotInManifestError(
+                raise CodeNotInManifestError(
                     f"O código '{sanitized_code}' foi encontrado, "
                     f"mas não existe no manifesto."
                 )
@@ -113,7 +115,7 @@ class ResolveExceptionUseCase:
             # 6. Renomeação Física
             expected_name = get_filename_with_revision(
                 matched_item.document_code + file_to_resolve.path.suffix,
-                matched_item.revision
+                matched_item.revision,
             )
             new_path = await self._file_manager.rename_file(
                 file_to_resolve.path, expected_name
@@ -125,7 +127,7 @@ class ResolveExceptionUseCase:
                 extra={
                     "code": sanitized_code,
                     "new_path": str(new_path),
-                }
+                },
             )
 
             return file_to_resolve
@@ -134,7 +136,7 @@ class ResolveExceptionUseCase:
             app_logger.error(
                 "Erro na resolução de exceção",
                 extra={"error": str(e), "error_type": type(e).__name__},
-                exc_info=True
+                exc_info=True,
             )
             # Re-raise se for erro de negócio conhecido, senão wrap ou log
             raise

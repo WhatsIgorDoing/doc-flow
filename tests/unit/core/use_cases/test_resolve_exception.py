@@ -1,4 +1,4 @@
-﻿import pytest
+import pytest
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock
 
@@ -29,7 +29,9 @@ async def test_resolve_success():
     file_to_resolve = DocumentFile(path=Path("strange_name.pdf"), size_bytes=0)
 
     mock_content_extractor = MagicMock()
-    mock_content_extractor.extract_text = AsyncMock(return_value="Conteúdo com DOC-123 no meio")
+    mock_content_extractor.extract_text = AsyncMock(
+        return_value="Conteúdo com DOC-123 no meio"
+    )
 
     mock_code_extractor = MagicMock()
     mock_code_extractor.find_code = AsyncMock(return_value="DOC-123")
@@ -37,13 +39,15 @@ async def test_resolve_success():
     mock_file_manager = MagicMock()
     mock_file_manager.rename_file = AsyncMock(return_value=Path("DOC-123_0.pdf"))
 
-    use_case = _make_use_case(mock_content_extractor, mock_code_extractor, mock_file_manager)
+    use_case = _make_use_case(
+        mock_content_extractor, mock_code_extractor, mock_file_manager
+    )
 
     # Execução
     resolved_file = await use_case.execute(
         file_to_resolve=file_to_resolve,
         profile_id="GENERIC",
-        all_manifest_items=[manifest_item]
+        all_manifest_items=[manifest_item],
     )
 
     # Verificação
@@ -72,9 +76,7 @@ async def test_resolve_extraction_failed():
 
     with pytest.raises(ExtractionFailedError):
         await use_case.execute(
-            file_to_resolve=file_to_resolve,
-            profile_id="GENERIC",
-            all_manifest_items=[]
+            file_to_resolve=file_to_resolve, profile_id="GENERIC", all_manifest_items=[]
         )
 
 
@@ -94,9 +96,7 @@ async def test_resolve_code_not_in_manifest():
     # Manifesto vazio, então DOC-999 não será encontrado
     with pytest.raises(CodeNotInManifestError):
         await use_case.execute(
-            file_to_resolve=file_to_resolve,
-            profile_id="GENERIC",
-            all_manifest_items=[]
+            file_to_resolve=file_to_resolve, profile_id="GENERIC", all_manifest_items=[]
         )
 
 
@@ -107,7 +107,9 @@ async def test_resolve_renames_file_with_correct_name():
     file_to_resolve = DocumentFile(path=Path("/docs/wrong_name.pdf"), size_bytes=1024)
 
     mock_content_extractor = MagicMock()
-    mock_content_extractor.extract_text = AsyncMock(return_value="ELE-700-CHZ-247 texto")
+    mock_content_extractor.extract_text = AsyncMock(
+        return_value="ELE-700-CHZ-247 texto"
+    )
 
     mock_code_extractor = MagicMock()
     mock_code_extractor.find_code = AsyncMock(return_value="ELE-700-CHZ-247")
@@ -116,12 +118,14 @@ async def test_resolve_renames_file_with_correct_name():
     expected_path = Path("/docs/ELE-700-CHZ-247_A.pdf")
     mock_file_manager.rename_file = AsyncMock(return_value=expected_path)
 
-    use_case = _make_use_case(mock_content_extractor, mock_code_extractor, mock_file_manager)
+    use_case = _make_use_case(
+        mock_content_extractor, mock_code_extractor, mock_file_manager
+    )
 
     resolved = await use_case.execute(
         file_to_resolve=file_to_resolve,
         profile_id="RIR",
-        all_manifest_items=[manifest_item]
+        all_manifest_items=[manifest_item],
     )
 
     assert resolved.path == expected_path

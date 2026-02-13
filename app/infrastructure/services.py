@@ -35,9 +35,9 @@ class GreedyLotBalancerService(ILotBalancerService):
         # Mas depois ele balanceia o TAMANHO (bytes).
         # Vamos manter a lógica original "Greedy" que tenta distribuir o PESO (bytes) uniformemente
         # entre N lotes fixos baseados na contagem inicial.
-        
+
         num_lots = math.ceil(len(sorted_groups) / max_docs_per_lot)
-        if num_lots < 1: 
+        if num_lots < 1:
             num_lots = 1
 
         # 3. Inicializa os lotes de saída

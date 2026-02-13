@@ -6,21 +6,25 @@ from app.domain.entities import DocumentFile
 from app.infrastructure.extraction import ProfiledExtractorService
 from app.core.interfaces import FileReadError
 
+
 # Mocks para PdfReader e docx.Document
 @pytest.fixture
 def mock_pdf_reader():
     with patch("app.infrastructure.extraction.PdfReader") as mock:
         yield mock
 
+
 @pytest.fixture
 def mock_docx_document():
     with patch("app.infrastructure.extraction.docx.Document") as mock:
         yield mock
 
+
 def test_load_profiles(tmp_path):
     """Testa o carregamento de configurações YAML."""
     config_file = tmp_path / "profiles.yaml"
-    config_file.write_text("""
+    config_file.write_text(
+        """
 profiles:
   RIR:
     patterns:
@@ -28,12 +32,15 @@ profiles:
   PID:
     patterns:
       - 'PID-(\\d+)'
-    """, encoding="utf-8")
+    """,
+        encoding="utf-8",
+    )
 
     service = ProfiledExtractorService(config_file)
     assert "RIR" in service._profiles
     assert "PID" in service._profiles
     assert service._profiles["RIR"]["patterns"] == ["RIR-(\\d+)"]
+
 
 @pytest.mark.asyncio
 async def test_extract_text_pdf(mock_pdf_reader):
@@ -54,6 +61,7 @@ async def test_extract_text_pdf(mock_pdf_reader):
     # Verificação
     assert text == "Conteúdo do PDF"
 
+
 @pytest.mark.asyncio
 async def test_extract_text_docx(mock_docx_document):
     """Testa extração de texto de DOCX."""
@@ -71,17 +79,21 @@ async def test_extract_text_docx(mock_docx_document):
     # Verificação
     assert text == "Conteúdo do DOCX"
 
+
 @pytest.mark.asyncio
 async def test_find_code_regex(tmp_path):
     """Testa a lógica de regex para encontrar códigos."""
     config_file = tmp_path / "profiles.yaml"
-    config_file.write_text("""
+    config_file.write_text(
+        """
 profiles:
   TEST_PROFILE:
     patterns:
       - 'CODIGO: (\\w+-\\d+)'
       - 'ALT: (\\d+)'
-    """, encoding="utf-8")
+    """,
+        encoding="utf-8",
+    )
 
     service = ProfiledExtractorService(config_file)
 

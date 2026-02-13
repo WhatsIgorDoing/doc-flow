@@ -31,21 +31,20 @@ class ValidationService:
     ) -> ValidationResult:
         """
         Executa validação de lote de documentos delegando para o caso de uso.
-        
+
         Persiste os resultados validados no banco de dados para passos subsequentes.
         """
         try:
             result = await self._Use_case.execute(manifest_path, source_directory)
-            
+
             # Persiste documentos validados se houver sucesso parcial ou total
             if result.validated_files:
                 self._db_manager.save_validated_documents(
                     self._db_manager.session_id, result.validated_files
                 )
-                
+
             return result
         except Exception as e:
             # O use case já loga erros, mas o service original capturava tudo e lançava ValidationError
             # Mantemos esse comportamento para compatibilidade
             raise ValidationError(f"Validation failed: {e}")
-

@@ -2,6 +2,7 @@
 Modelos de domínio usando SQLModel (Pydantic + SQLAlchemy).
 Representam as entidades do banco de dados local.
 """
+
 from datetime import datetime
 from typing import Optional
 from sqlmodel import SQLModel, Field

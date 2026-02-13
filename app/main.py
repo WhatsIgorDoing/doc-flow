@@ -16,6 +16,7 @@ app.include_router(api_router)
 
 # ... (skip to Line 101)
 
+
 # Página principal
 @ui.page("/")
 def main_page():

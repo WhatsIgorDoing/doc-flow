@@ -90,15 +90,15 @@ class ManifestRepository(IManifestRepository):
         # Configurações de detecção
         MAX_HEADER_SCAN = 20
         header_row_idx = 0
-        
+
         # Mapa de colunas (nome -> índice)
         col_map = {}
-        
+
         # Palavras-chave para identificar colunas (lower case)
         KEYWORDS = {
-            'document_code': ['documento', 'código', 'codigo', 'code', 'doc'],
-            'revision': ['revisão', 'revisao', 'rev', 'revision'],
-            'title': ['título', 'titulo', 'title', 'descrição', 'descricao']
+            "document_code": ["documento", "código", "codigo", "code", "doc"],
+            "revision": ["revisão", "revisao", "rev", "revision"],
+            "title": ["título", "titulo", "title", "descrição", "descricao"],
         }
 
         # 1. Detectar linha de cabeçalho (Melhor Match)
@@ -106,9 +106,11 @@ class ManifestRepository(IManifestRepository):
         best_col_map = {}
         max_matches = 0
 
-        for i, row in enumerate(sheet.iter_rows(min_row=1, max_row=MAX_HEADER_SCAN, values_only=True), 1):
+        for i, row in enumerate(
+            sheet.iter_rows(min_row=1, max_row=MAX_HEADER_SCAN, values_only=True), 1
+        ):
             row_values = [str(cell).lower().strip() if cell else "" for cell in row]
-            
+
             # Tenta encontrar colunas obrigatórias
             found_cols = {}
             for target_field, keywords in KEYWORDS.items():
@@ -117,9 +119,9 @@ class ManifestRepository(IManifestRepository):
                         # Evitar sobrescrever se já encontrou match exato/melhor
                         if target_field not in found_cols:
                             found_cols[target_field] = idx
-                        elif cell_res in keywords: # Prioridade para match exato
+                        elif cell_res in keywords:  # Prioridade para match exato
                             found_cols[target_field] = idx
-            
+
             # Pontuação: Quantas colunas obrigatórias encontrou
             match_count = len(found_cols)
 
@@ -127,28 +129,37 @@ class ManifestRepository(IManifestRepository):
             # 1. Deve ter 'document_code'
             # 2. Deve ter mais matches que o anterior
             # 3. Se empate, prefere o que tem mais matches exatos (opcional, aqui simplificado)
-            if 'document_code' in found_cols and match_count >= 2:
+            if "document_code" in found_cols and match_count >= 2:
                 if match_count > max_matches:
                     max_matches = match_count
                     best_header_row = i
                     best_col_map = found_cols
-        
+
         if best_header_row > 0:
             header_row_idx = best_header_row
             col_map = best_col_map
-            app_logger.info(f"Header detected at row {header_row_idx}. Map: {col_map} (Matches: {max_matches})")
-        
+            app_logger.info(
+                f"Header detected at row {header_row_idx}. Map: {col_map} (Matches: {max_matches})"
+            )
+
         # Fallback: Se não detectou cabeçalho, assume formato legado (A=Code, B=Rev, C=Title, Row 1=Header)
         if not header_row_idx:
             header_row_idx = 1
-            col_map = {'document_code': 0, 'revision': 1, 'title': 2}
-            app_logger.warning("Header not detected dynamically, using legacy fallback (A=Code, B=Rev, C=Title)")
+            col_map = {"document_code": 0, "revision": 1, "title": 2}
+            app_logger.warning(
+                "Header not detected dynamically, using legacy fallback (A=Code, B=Rev, C=Title)"
+            )
 
         # Obter lista de cabeçalhos para metadados
         # Precisamos ler a linha de cabeçalho novamente para ter os nomes originais
         header_cells = []
-        for row in sheet.iter_rows(min_row=header_row_idx, max_row=header_row_idx, values_only=True):
-            header_cells = [str(cell).strip() if cell else f"Column_{i}" for i, cell in enumerate(row)]
+        for row in sheet.iter_rows(
+            min_row=header_row_idx, max_row=header_row_idx, values_only=True
+        ):
+            header_cells = [
+                str(cell).strip() if cell else f"Column_{i}"
+                for i, cell in enumerate(row)
+            ]
             break
 
         # 2. Ler dados
@@ -156,17 +167,21 @@ class ManifestRepository(IManifestRepository):
             # Ignora linhas totalmente vazias
             if not any(row):
                 continue
-            
+
             # Extrair campos principais usando o mapa
             try:
                 # Code
-                idx_code = col_map.get('document_code')
-                raw_code = row[idx_code] if idx_code is not None and idx_code < len(row) else None
+                idx_code = col_map.get("document_code")
+                raw_code = (
+                    row[idx_code]
+                    if idx_code is not None and idx_code < len(row)
+                    else None
+                )
                 document_code = str(raw_code).strip() if raw_code else ""
-                
+
                 # Ignora se não tiver código (linha inválida ou de formatação)
                 if not document_code or len(document_code) < 3:
-                     continue
+                    continue
 
                 # Validar se é um código real (ex: ignorar linhas que repetem cabeçalho ou são notas)
                 # Heurística simples: não deve ser igual ao nome da coluna
@@ -177,27 +192,37 @@ class ManifestRepository(IManifestRepository):
                     if doc_lower in k_list:
                         is_header_repeat = True
                         break
-                
+
                 if is_header_repeat:
                     continue
 
                 # Revision
-                idx_rev = col_map.get('revision')
-                raw_rev = row[idx_rev] if idx_rev is not None and idx_rev < len(row) else None
+                idx_rev = col_map.get("revision")
+                raw_rev = (
+                    row[idx_rev] if idx_rev is not None and idx_rev < len(row) else None
+                )
                 revision = str(raw_rev).strip() if raw_rev else "0"
-                
+
                 # Title
-                idx_title = col_map.get('title')
-                raw_title = row[idx_title] if idx_title is not None and idx_title < len(row) else None
+                idx_title = col_map.get("title")
+                raw_title = (
+                    row[idx_title]
+                    if idx_title is not None and idx_title < len(row)
+                    else None
+                )
                 title = str(raw_title).strip() if raw_title else ""
 
                 # Metadata: tudo que não é coluna principal mapeada
                 metadata = {}
                 main_indices = set(col_map.values())
                 for i, val in enumerate(row):
-                    if i not in main_indices and i < len(header_cells) and val is not None:
+                    if (
+                        i not in main_indices
+                        and i < len(header_cells)
+                        and val is not None
+                    ):
                         metadata[header_cells[i]] = val
-                
+
                 items.append(
                     ManifestItem(
                         document_code=document_code,
@@ -209,7 +234,10 @@ class ManifestRepository(IManifestRepository):
 
             except Exception as e:
                 # Logar e continuar (best effort)
-                app_logger.warning(f"Error parsing row in manifest: {e}", extra={"row_content": str(row)[:100]})
+                app_logger.warning(
+                    f"Error parsing row in manifest: {e}",
+                    extra={"row_content": str(row)[:100]},
+                )
                 continue
 
         workbook.close()
@@ -457,4 +485,3 @@ class FileSystemManager(IFileSystemManager):
                 },
             )
             raise FileOperationError(f"Failed to rename {source} to {new_name}: {e}")
-

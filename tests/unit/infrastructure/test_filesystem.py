@@ -19,15 +19,15 @@ async def test_create_directory_success(tmp_path):
 async def test_move_file_success(tmp_path):
     """Testa movimentação de arquivo."""
     manager = FileSystemManager()
-    
+
     source = tmp_path / "source.txt"
     source.write_text("content")
-    
+
     dest = tmp_path / "dest_folder" / "moved.txt"
-    
+
     # Dest folder não existe, o manager deve criar
     await manager.move_file(source, dest)
-    
+
     assert not source.exists()
     assert dest.exists()
     assert dest.read_text() == "content"
@@ -37,15 +37,15 @@ async def test_move_file_success(tmp_path):
 async def test_copy_file_success(tmp_path):
     """Testa cópia de arquivo."""
     manager = FileSystemManager()
-    
+
     source = tmp_path / "original.txt"
     source.write_text("content to copy")
-    
+
     dest = tmp_path / "backup" / "copy.txt"
-    
+
     await manager.copy_file(source, dest)
-    
-    assert source.exists() # Origem mantida
+
+    assert source.exists()  # Origem mantida
     assert dest.exists()
     assert dest.read_text() == "content to copy"
 
@@ -97,4 +97,3 @@ async def test_rename_file_source_not_found(tmp_path):
 
     with pytest.raises(FileOperationError, match="does not exist"):
         await manager.rename_file(source, "new_name.pdf")
-
