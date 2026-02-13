@@ -335,8 +335,8 @@ class FileSystemManager(IFileSystemManager):
         try:
             loop = asyncio.get_event_loop()
             await loop.run_in_executor(
-                None, path.mkdir, True, True
-            )  # parents=True, exist_ok=True
+                None, lambda: path.mkdir(parents=True, exist_ok=True)
+            )
 
             app_logger.debug("Directory created", extra={"directory": str(path)})
 
