@@ -1,10 +1,11 @@
-import pytest
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import pytest
+
+from app.core.interfaces import FileReadError
 from app.domain.entities import DocumentFile
 from app.infrastructure.extraction import ProfiledExtractorService
-from app.core.interfaces import FileReadError
 
 
 # Mocks para PdfReader e docx.Document

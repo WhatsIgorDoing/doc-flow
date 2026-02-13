@@ -9,10 +9,10 @@ from app.domain.entities import (
     OrganizationResult,
 )
 from app.domain.exceptions import OrganizationError
+from app.infrastructure.database import DatabaseManager
 from app.infrastructure.repositories import FileSystemManager
 from app.infrastructure.services import GreedyLotBalancerService
 from app.infrastructure.template_filler import OpenpyxlTemplateFiller
-from app.infrastructure.database import DatabaseManager
 from app.use_cases.organize_lots import OrganizeLotsUseCase
 
 
@@ -65,9 +65,11 @@ class OrganizationService:
             doc = DocumentFile(
                 path=Path(v_doc.path),
                 size_bytes=v_doc.size_bytes,
-                status=DocumentStatus(v_doc.status)
-                if v_doc.status
-                else DocumentStatus.UNVALIDATED,
+                status=(
+                    DocumentStatus(v_doc.status)
+                    if v_doc.status
+                    else DocumentStatus.UNVALIDATED
+                ),
             )
             # Reconstruir ManifestItem se disponível
             if v_doc.document_code:
