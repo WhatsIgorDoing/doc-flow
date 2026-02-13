@@ -16,6 +16,19 @@ from app.domain.entities import (
     ValidationResult,
 )
 
+# Padrões de sufixos de revisão típicos
+REVISION_PATTERNS = [
+    re.compile(r"_[A-Z]$", re.IGNORECASE),  # _A, _B, _C, etc.
+    re.compile(r"_Rev\d+$", re.IGNORECASE),  # _Rev0, _Rev1, _Rev2, etc.
+    re.compile(r"_\d+$", re.IGNORECASE),  # _0, _1, _2, etc.
+    re.compile(r"_final$", re.IGNORECASE),  # _final
+    re.compile(r"_temp$", re.IGNORECASE),  # _temp
+    re.compile(r"_old$", re.IGNORECASE),  # _old
+    re.compile(r"_backup$", re.IGNORECASE),  # _backup
+    re.compile(r"_draft$", re.IGNORECASE),  # _draft
+    re.compile(r"_preliminary$", re.IGNORECASE),  # _preliminary
+]
+
 
 class ValidateBatchUseCase:
     """
@@ -44,25 +57,12 @@ class ValidateBatchUseCase:
         """
         name_without_ext = Path(file_name).stem
 
-        # Padrões de sufixos de revisão típicos
-        revision_patterns = [
-            r"_[A-Z]$",  # _A, _B, _C, etc.
-            r"_Rev\d+$",  # _Rev0, _Rev1, _Rev2, etc.
-            r"_rev\d+$",  # _rev0, _rev1, _rev2, etc.
-            r"_\d+$",  # _0, _1, _2, etc.
-            r"_final$",  # _final
-            r"_temp$",  # _temp
-            r"_old$",  # _old
-            r"_backup$",  # _backup
-            r"_draft$",  # _draft
-            r"_preliminary$",  # _preliminary
-        ]
-
         # Verifica se há um sufixo de revisão no final
-        for pattern in revision_patterns:
-            if re.search(pattern, name_without_ext, re.IGNORECASE):
-                # Remove o sufixo encontrado
-                return re.sub(pattern, "", name_without_ext, flags=re.IGNORECASE)
+        for pattern in REVISION_PATTERNS:
+            new_name = pattern.sub("", name_without_ext)
+            if new_name != name_without_ext:
+                # Remove o sufixo encontrado e retorna
+                return new_name
 
         # Se não encontrou nenhum sufixo conhecido, retorna o nome completo
         return name_without_ext
