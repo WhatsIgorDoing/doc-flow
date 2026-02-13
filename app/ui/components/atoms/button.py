@@ -1,5 +1,7 @@
-from nicegui import ui
 from typing import Callable, Optional
+
+from nicegui import ui
+
 from app.ui.theme.design_system import design
 
 

@@ -11,16 +11,10 @@ import openpyxl
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.worksheet.worksheet import Worksheet
 
-from app.core.interfaces import (
-    IFileSystemManager,
-    ITemplateFiller,
-)
+from app.core.interfaces import IFileSystemManager, ITemplateFiller
 from app.core.logger import app_logger
 from app.domain.entities import DocumentGroup
-from app.domain.exceptions import (
-    TemplateFillError,
-    TemplateNotFoundError,
-)
+from app.domain.exceptions import TemplateFillError, TemplateNotFoundError
 from app.domain.file_naming import get_filename_with_revision
 
 

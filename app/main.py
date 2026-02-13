@@ -5,11 +5,10 @@ Integra NiceGUI em modo nativo (desktop).
 
 from nicegui import app, ui
 
+from app.api.endpoints import router as api_router
 from app.core.config import settings
 from app.core.logger import app_logger
-
 from app.ui.pages.dashboard import ValidationDashboard
-from app.api.endpoints import router as api_router
 
 # Registra rotas da API
 app.include_router(api_router)
