@@ -1,6 +1,7 @@
 import pytest
 from app.ui.theme.design_system import ResponsiveLayout, DesignTokens
 
+
 class TestResponsiveLayout:
     def test_get_window_size_large_screen(self):
         """Test window size calculation for screens larger than xlarge breakpoint."""
@@ -22,7 +23,7 @@ class TestResponsiveLayout:
     def test_get_window_size_exact_xlarge_breakpoint(self):
         """Test window size calculation for screens exactly at xlarge breakpoint."""
         # Arrange
-        screen_width = DesignTokens.BREAKPOINTS["xlarge"] # 1280
+        screen_width = DesignTokens.BREAKPOINTS["xlarge"]  # 1280
         screen_height = 800
 
         # Act
@@ -37,7 +38,7 @@ class TestResponsiveLayout:
     def test_get_window_size_small_screen(self):
         """Test window size calculation for screens smaller than xlarge breakpoint."""
         # Arrange
-        screen_width = 1024 # Less than 1280
+        screen_width = 1024  # Less than 1280
         screen_height = 768
         xlarge_breakpoint = DesignTokens.BREAKPOINTS["xlarge"]
         assert screen_width < xlarge_breakpoint
