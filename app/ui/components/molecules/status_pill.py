@@ -1,4 +1,5 @@
 from nicegui import ui
+
 from app.ui.theme.design_system import design
 
 
