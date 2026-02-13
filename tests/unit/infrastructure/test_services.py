@@ -3,6 +3,7 @@ from app.infrastructure.services import GreedyLotBalancerService
 from app.domain.entities import DocumentGroup, DocumentFile, OutputLot
 from pathlib import Path
 
+
 class TestGreedyLotBalancerService:
     def test_balance_lots_empty_groups(self):
         service = GreedyLotBalancerService()
@@ -12,7 +13,10 @@ class TestGreedyLotBalancerService:
     def test_balance_lots_single_group(self):
         service = GreedyLotBalancerService()
         groups = [
-            DocumentGroup(document_code="DOC-1", files=[DocumentFile(path=Path("f1"), size_bytes=100)])
+            DocumentGroup(
+                document_code="DOC-1",
+                files=[DocumentFile(path=Path("f1"), size_bytes=100)],
+            )
         ]
         lots = service.balance_lots(groups, 10)
         assert len(lots) == 1
@@ -24,10 +28,12 @@ class TestGreedyLotBalancerService:
         # Create 10 groups with varying sizes
         groups = []
         for i in range(10):
-            groups.append(DocumentGroup(
-                document_code=f"DOC-{i}",
-                files=[DocumentFile(path=Path(f"f{i}"), size_bytes=(i + 1) * 100)]
-            ))
+            groups.append(
+                DocumentGroup(
+                    document_code=f"DOC-{i}",
+                    files=[DocumentFile(path=Path(f"f{i}"), size_bytes=(i + 1) * 100)],
+                )
+            )
 
         # Expect 2 lots (10 groups / 5 max_docs = 2 lots)
         lots = service.balance_lots(groups, 5)
@@ -46,7 +52,12 @@ class TestGreedyLotBalancerService:
 
     def test_balance_lots_max_docs_zero(self):
         service = GreedyLotBalancerService()
-        groups = [DocumentGroup(document_code="DOC-1", files=[DocumentFile(path=Path("f1"), size_bytes=100)])]
+        groups = [
+            DocumentGroup(
+                document_code="DOC-1",
+                files=[DocumentFile(path=Path("f1"), size_bytes=100)],
+            )
+        ]
         # Should default to 1 lot if max_docs <= 0, or handle gracefully
         lots = service.balance_lots(groups, 0)
         assert len(lots) >= 1
