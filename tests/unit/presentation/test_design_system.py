@@ -1,5 +1,6 @@
 import pytest
-from app.ui.theme.design_system import ResponsiveLayout, DesignTokens
+
+from app.ui.theme.design_system import DesignTokens, ResponsiveLayout
 
 
 class TestResponsiveLayout:

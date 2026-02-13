@@ -2,8 +2,9 @@
 Script para criar fixtures de teste ausentes para o SAD_APP v2.0
 """
 
-import openpyxl
 from pathlib import Path
+
+import openpyxl
 from docx import Document
 
 
@@ -39,8 +40,8 @@ def create_manifesto_exemplo():
 
 def create_documento_rir_pdf():
     """Cria o arquivo documento_rir.pdf com texto contendo código"""
-    from reportlab.pdfgen import canvas
     from reportlab.lib.pagesizes import letter
+    from reportlab.pdfgen import canvas
 
     fixture_path = Path("tests/fixtures/documento_rir.pdf")
     fixture_path.parent.mkdir(parents=True, exist_ok=True)

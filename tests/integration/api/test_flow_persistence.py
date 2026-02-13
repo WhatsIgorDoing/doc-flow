@@ -1,20 +1,21 @@
-import pytest
 import uuid
-from unittest.mock import MagicMock, patch, AsyncMock
-from fastapi.testclient import TestClient
 from pathlib import Path
+from unittest.mock import AsyncMock, MagicMock, patch
 
-from app.main import app
-from app.api.endpoints import get_validation_service, get_organization_service
-from app.services.validation_service import ValidationService
-from app.services.organization_service import OrganizationService
-from app.infrastructure.database import db_manager, DatabaseManager
+import pytest
+from fastapi.testclient import TestClient
+
+from app.api.endpoints import get_organization_service, get_validation_service
 from app.domain.entities import (
-    ValidationResult,
     DocumentFile,
     DocumentStatus,
     OrganizationResult,
+    ValidationResult,
 )
+from app.infrastructure.database import DatabaseManager, db_manager
+from app.main import app
+from app.services.organization_service import OrganizationService
+from app.services.validation_service import ValidationService
 
 # Test Client
 client = TestClient(app)

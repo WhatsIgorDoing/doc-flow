@@ -1,6 +1,7 @@
-import requests
 import json
 from datetime import datetime
+
+import requests
 
 # Configuration
 API_URL = "http://localhost:3000/api/validation/submit"
