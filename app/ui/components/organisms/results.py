@@ -60,11 +60,15 @@ class ResultsList(GlassCard):
                         "Limpar Seleção",
                         on_click=self._clear_selection,
                     ).props("flat dense text-color=grey-7 size=sm")
-                    self.btn_resolve = ui.button(
-                        "Resolver Selecionados",
-                        on_click=self._handle_resolve,
-                        icon="auto_fix_high",
-                    ).props("color=orange dense").classes("ml-2")
+                    self.btn_resolve = (
+                        ui.button(
+                            "Resolver Selecionados",
+                            on_click=self._handle_resolve,
+                            icon="auto_fix_high",
+                        )
+                        .props("color=orange dense")
+                        .classes("ml-2")
+                    )
 
             # List container
             self.list_container = ui.column().classes("w-full gap-3")

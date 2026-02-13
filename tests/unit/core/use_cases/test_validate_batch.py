@@ -27,7 +27,9 @@ async def test_validate_batch_happy_path():
     # -- Criar Mocks dos Repositórios
     mock_manifest_repo = MagicMock()
     # Usar AsyncMock ou return_value futuro para métodos async
-    mock_manifest_repo.load_from_file = AsyncMock(return_value=[manifest_item1, manifest_item2])
+    mock_manifest_repo.load_from_file = AsyncMock(
+        return_value=[manifest_item1, manifest_item2]
+    )
 
     mock_file_repo = MagicMock()
     mock_file_repo.list_files = AsyncMock(return_value=[file1, file2, file3])
@@ -36,7 +38,7 @@ async def test_validate_batch_happy_path():
     use_case = ValidateBatchUseCase(
         manifest_repo=mock_manifest_repo, file_repo=mock_file_repo
     )
-    
+
     # O novo use case retorna um objeto ValidationResult, não uma tupla
     result = await use_case.execute(
         manifest_path=Path("C:/fake/manifest.xlsx"), source_directory=Path("C:/fake/")
@@ -45,7 +47,7 @@ async def test_validate_batch_happy_path():
     # 3. Verificação (Asserts)
     validated = result.validated_files
     unrecognized = result.unrecognized_files
-    
+
     assert len(validated) == 2
     assert len(unrecognized) == 1
     assert result.success is True
@@ -74,7 +76,9 @@ async def test_validate_batch_all_files_match():
     file2 = DocumentFile(path=Path("C:/fake/DOC-002_B.docx"), size_bytes=200)
 
     mock_manifest_repo = MagicMock()
-    mock_manifest_repo.load_from_file = AsyncMock(return_value=[manifest_item1, manifest_item2])
+    mock_manifest_repo.load_from_file = AsyncMock(
+        return_value=[manifest_item1, manifest_item2]
+    )
 
     mock_file_repo = MagicMock()
     mock_file_repo.list_files = AsyncMock(return_value=[file1, file2])
@@ -106,7 +110,9 @@ async def test_validate_batch_no_files_match():
     file2 = DocumentFile(path=Path("C:/fake/DOC-888_B.docx"), size_bytes=200)
 
     mock_manifest_repo = MagicMock()
-    mock_manifest_repo.load_from_file = AsyncMock(return_value=[manifest_item1, manifest_item2])
+    mock_manifest_repo.load_from_file = AsyncMock(
+        return_value=[manifest_item1, manifest_item2]
+    )
 
     mock_file_repo = MagicMock()
     mock_file_repo.list_files = AsyncMock(return_value=[file1, file2])
@@ -122,7 +128,9 @@ async def test_validate_batch_no_files_match():
     # Verificação
     assert len(result.validated_files) == 0
     assert len(result.unrecognized_files) == 2
-    assert all(file.status == DocumentStatus.UNRECOGNIZED for file in result.unrecognized_files)
+    assert all(
+        file.status == DocumentStatus.UNRECOGNIZED for file in result.unrecognized_files
+    )
 
 
 def test_get_file_base_name():

@@ -54,7 +54,7 @@ class ProfiledExtractorService(IContentExtractor, ICodeExtractor):
         """
         try:
             loop = asyncio.get_event_loop()
-            
+
             if file.path.suffix.lower() == ".pdf":
                 return await loop.run_in_executor(
                     None, self._extract_text_from_pdf, file.path

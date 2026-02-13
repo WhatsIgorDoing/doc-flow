@@ -19,7 +19,7 @@ async def test_organize_lots_success():
     validated_file = DocumentFile(
         path=Path("C:/source/DOC-001.pdf"),
         size_bytes=1024,
-        associated_manifest_item=manifest_item
+        associated_manifest_item=manifest_item,
     )
     validated_files = [validated_file]
 
@@ -44,20 +44,20 @@ async def test_organize_lots_success():
     use_case = OrganizeLotsUseCase(
         balancer=mock_balancer,
         file_manager=mock_file_manager,
-        template_filler=mock_template_filler
+        template_filler=mock_template_filler,
     )
 
     # 2. Execução
     output_dir = Path("C:/output")
     template_path = Path("C:/templates/master.xlsx")
-    
+
     result = await use_case.execute(
         validated_files=validated_files,
         output_directory=output_dir,
         master_template_path=template_path,
         max_docs_per_lot=100,
         start_sequence_number=1,
-        lot_name_pattern="LOT_XXXX"
+        lot_name_pattern="LOT_XXXX",
     )
 
     # 3. Verificação
@@ -72,15 +72,17 @@ async def test_organize_lots_success():
 
     # - Deve ter movido o arquivo DOC-001.pdf para o diretório do lote
     # O nome seria o mesmo pois a revisão é "0" e não temos sufixo conflitante
-    # Ou se a lógica de _get_filename_with_revision adicionar _0, verificamos isso.
+    # Ou se a lógica de get_filename_with_revision adicionar _0, verificamos isso.
     # Assumindo que a lógica adiciona _rev se não existir.
-    expected_dest_path = expected_lot_dir / "DOC-001_0.pdf" 
-    mock_file_manager.move_file.assert_called_with(validated_file.path, expected_dest_path)
+    expected_dest_path = expected_lot_dir / "DOC-001_0.pdf"
+    mock_file_manager.move_file.assert_called_with(
+        validated_file.path, expected_dest_path
+    )
 
     # Verificar chamadas ao TemplateFiller
     expected_manifest_path = expected_lot_dir / "LOT_0001.xlsx"
     mock_template_filler.fill_and_save.assert_called_once()
-    
+
     # args: template_path, output_path, groups
     call_args = mock_template_filler.fill_and_save.call_args
     assert call_args[0][0] == template_path
@@ -99,12 +101,14 @@ async def test_organize_lots_file_move_error():
     validated_file = DocumentFile(
         path=Path("C:/source/DOC-001.pdf"),
         size_bytes=1024,
-        associated_manifest_item=manifest_item
+        associated_manifest_item=manifest_item,
     )
-    
+
     mock_balancer = MagicMock()
     group = DocumentGroup(document_code="DOC-001", files=[validated_file])
-    mock_balancer.balance_lots.return_value = [OutputLot(lot_name="LOT_0001", groups=[group])]
+    mock_balancer.balance_lots.return_value = [
+        OutputLot(lot_name="LOT_0001", groups=[group])
+    ]
 
     mock_file_manager = MagicMock()
     mock_file_manager.create_directory = AsyncMock()
@@ -116,7 +120,7 @@ async def test_organize_lots_file_move_error():
     use_case = OrganizeLotsUseCase(
         balancer=mock_balancer,
         file_manager=mock_file_manager,
-        template_filler=mock_template_filler
+        template_filler=mock_template_filler,
     )
 
     # Execução
@@ -126,7 +130,7 @@ async def test_organize_lots_file_move_error():
         master_template_path=Path("C:/template.xlsx"),
         max_docs_per_lot=100,
         start_sequence_number=1,
-        lot_name_pattern="LOT_XXXX"
+        lot_name_pattern="LOT_XXXX",
     )
 
     # Verificação

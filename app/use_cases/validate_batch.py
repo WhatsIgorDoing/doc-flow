@@ -23,9 +23,7 @@ class ValidateBatchUseCase:
     Orquestra os repositórios para comparar arquivos no disco com um manifesto.
     """
 
-    def __init__(
-        self, manifest_repo: IManifestRepository, file_repo: IFileRepository
-    ):
+    def __init__(self, manifest_repo: IManifestRepository, file_repo: IFileRepository):
         """
         Inicializa o caso de uso com as dependências (repositórios).
         Isso é Injeção de Dependência.

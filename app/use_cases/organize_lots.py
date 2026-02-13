@@ -20,8 +20,6 @@ from app.domain.entities import (
 from app.domain.file_naming import get_filename_with_revision
 
 
-
-
 class OrganizeLotsUseCase:
     """
     Implementa o Caso de Uso UC-03: Organizar e Gerar Lotes de Saída.
