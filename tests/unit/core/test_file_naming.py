@@ -12,36 +12,37 @@ from app.domain.file_naming import get_filename_with_revision, generate_unique_f
 class TestGetFilenameWithRevision:
     """Testes para get_filename_with_revision."""
 
-    def test_adds_revision_to_pdf(self):
-        assert get_filename_with_revision("arquivo.pdf", "A") == "arquivo_A.pdf"
+    @pytest.mark.parametrize(
+        "original, revision, expected",
+        [
+            ("arquivo.pdf", "A", "arquivo_A.pdf"),
+            ("DOC-001.docx", "B", "DOC-001_B.docx"),
+            ("arquivo_A.pdf", "A", "arquivo_A.pdf"),  # No duplication
+            ("arquivo", "B", "arquivo_B"),  # No extension
+            ("arquivo_B", "B", "arquivo_B"),  # No duplication without extension
+            ("DOC-123.pdf", "0", "DOC-123_0.pdf"),
+            ("DOC-123_0.pdf", "0", "DOC-123_0.pdf"),  # Numeric revision
+            ("DOC-123.pdf", "", "DOC-123_.pdf"),  # Empty revision
+            ("DOC.pdf", "Rev3", "DOC_Rev3.pdf"),  # Long revision
 
-    def test_adds_revision_to_docx(self):
-        assert get_filename_with_revision("DOC-001.docx", "B") == "DOC-001_B.docx"
+            # Edge cases
+            (".gitignore", "A", ".gitignore_A"),  # Hidden file (expect fix)
+            (".config", "v1", ".config_v1"),
+            ("archive.tar.gz", "A", "archive.tar_A.gz"),
+            ("file.", "A", "file._A"), # Trailing dot
+            ("my file.pdf", "A", "my file_A.pdf"),  # Spaces
+            ("..dots", "A", "._A.dots"), # weird case, consistent with pathlib
 
-    def test_no_duplication_when_revision_exists(self):
-        assert get_filename_with_revision("arquivo_A.pdf", "A") == "arquivo_A.pdf"
-
-    def test_adds_revision_without_extension(self):
-        assert get_filename_with_revision("arquivo", "B") == "arquivo_B"
-
-    def test_no_duplication_without_extension(self):
-        assert get_filename_with_revision("arquivo_B", "B") == "arquivo_B"
-
-    def test_numeric_revision(self):
-        assert get_filename_with_revision("DOC-123.pdf", "0") == "DOC-123_0.pdf"
-
-    def test_numeric_revision_no_duplication(self):
-        assert get_filename_with_revision("DOC-123_0.pdf", "0") == "DOC-123_0.pdf"
-
-    def test_empty_revision(self):
-        assert get_filename_with_revision("DOC-123.pdf", "") == "DOC-123_.pdf"
-
-    def test_long_revision(self):
-        assert get_filename_with_revision("DOC.pdf", "Rev3") == "DOC_Rev3.pdf"
+            # Case sensitivity check
+            ("file_a.pdf", "A", "file_a_A.pdf"),
+        ],
+    )
+    def test_get_filename_with_revision(self, original, revision, expected):
+        assert get_filename_with_revision(original, revision) == expected
 
 
 class TestGenerateUniqueFilename:
-    """Testes para generate_unique_filename."""
+    """Testes para generate_unique_filename (mantendo os existentes)."""
 
     def test_first_conflict_gets_001(self, tmp_path):
         existing = tmp_path / "doc.pdf"

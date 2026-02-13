@@ -19,17 +19,15 @@ def get_filename_with_revision(original_filename: str, revision: str) -> str:
         >>> get_filename_with_revision("arquivo", "B")
         'arquivo_B'
     """
-    name_parts = original_filename.rsplit(".", 1)
+    path = Path(original_filename)
+    stem = path.stem
+    suffix = path.suffix
 
-    if len(name_parts) == 2:
-        base_name, extension = name_parts
-        if base_name.endswith(f"_{revision}"):
-            return original_filename
-        return f"{base_name}_{revision}.{extension}"
-    else:
-        if original_filename.endswith(f"_{revision}"):
-            return original_filename
-        return f"{original_filename}_{revision}"
+    if stem.endswith(f"_{revision}"):
+        return original_filename
+
+    new_filename = f"{stem}_{revision}{suffix}"
+    return str(path.with_name(new_filename))
 
 
 def generate_unique_filename(target_path: Path) -> Path:
