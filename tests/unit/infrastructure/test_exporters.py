@@ -8,7 +8,12 @@ from tempfile import TemporaryDirectory
 import openpyxl
 import pytest
 
-from app.domain.entities import ValidationResult, DocumentFile, ManifestItem, DocumentStatus
+from app.domain.entities import (
+    DocumentFile,
+    DocumentStatus,
+    ManifestItem,
+    ValidationResult,
+)
 from app.infrastructure.exporters import ValidationResultsExporter
 
 
@@ -20,30 +25,27 @@ def exporter():
 @pytest.fixture
 def sample_result():
     manifest_item = ManifestItem(
-        document_code="DOC-001",
-        revision="A",
-        title="Test Document",
-        metadata={}
+        document_code="DOC-001", revision="A", title="Test Document", metadata={}
     )
 
     validated_file = DocumentFile(
         path=Path("docs/DOC-001_A.pdf"),
         size_bytes=1024,
         status=DocumentStatus.VALIDATED,
-        associated_manifest_item=manifest_item
+        associated_manifest_item=manifest_item,
     )
 
     unrecognized_file = DocumentFile(
         path=Path("docs/unknown.pdf"),
         size_bytes=2048,
-        status=DocumentStatus.UNRECOGNIZED
+        status=DocumentStatus.UNRECOGNIZED,
     )
 
     return ValidationResult(
         validated_files=[validated_file],
         unrecognized_files=[unrecognized_file],
         validated_count=1,
-        unrecognized_count=1
+        unrecognized_count=1,
     )
 
 

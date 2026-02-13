@@ -6,11 +6,11 @@ from pathlib import Path
 from typing import List
 
 import openpyxl
-from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.worksheet import Worksheet
 
-from app.domain.entities import ValidationResult, DocumentFile, DocumentStatus
+from app.domain.entities import DocumentFile, DocumentStatus, ValidationResult
 
 
 class ValidationResultsExporter:
@@ -37,7 +37,14 @@ class ValidationResultsExporter:
 
     def _fill_validated_sheet(self, sheet: Worksheet, files: List[DocumentFile]):
         """Preenche a aba de arquivos validados."""
-        headers = ["Status", "Arquivo", "Caminho Original", "Código", "Revisão", "Título"]
+        headers = [
+            "Status",
+            "Arquivo",
+            "Caminho Original",
+            "Código",
+            "Revisão",
+            "Título",
+        ]
         self._setup_header(sheet, headers)
 
         for row_idx, file in enumerate(files, start=2):
@@ -82,13 +89,15 @@ class ValidationResultsExporter:
         for col_idx, header in enumerate(headers, start=1):
             cell = sheet.cell(row=1, column=col_idx, value=header)
             cell.font = Font(bold=True, color="FFFFFF")
-            cell.fill = PatternFill(start_color="4F81BD", end_color="4F81BD", fill_type="solid")
+            cell.fill = PatternFill(
+                start_color="4F81BD", end_color="4F81BD", fill_type="solid"
+            )
             cell.alignment = Alignment(horizontal="center", vertical="center")
             cell.border = Border(
                 left=Side(style="thin"),
                 right=Side(style="thin"),
                 top=Side(style="thin"),
-                bottom=Side(style="thin")
+                bottom=Side(style="thin"),
             )
 
     def _apply_styles(self, sheet: Worksheet):

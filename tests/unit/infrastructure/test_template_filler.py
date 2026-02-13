@@ -1,8 +1,10 @@
-import pytest
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
+
+from app.domain.entities import DocumentFile, DocumentGroup, ManifestItem
 from app.infrastructure.template_filler import OpenpyxlTemplateFiller
-from app.domain.entities import DocumentGroup, DocumentFile, ManifestItem
 
 
 @pytest.mark.asyncio

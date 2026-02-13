@@ -12,10 +12,7 @@ import docx
 import yaml
 from PyPDF2 import PdfReader
 
-from app.core.interfaces import (
-    ICodeExtractor,
-    IContentExtractor,
-)
+from app.core.interfaces import ICodeExtractor, IContentExtractor
 from app.core.logger import app_logger
 from app.domain.entities import DocumentFile
 from app.domain.exceptions import FileReadError
