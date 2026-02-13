@@ -4,7 +4,7 @@ Implementa rotas FastAPI para os Use Cases refatorados.
 """
 
 from pathlib import Path
-from typing import List, Optional
+from typing import List
 
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field, field_validator

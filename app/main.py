@@ -3,19 +3,10 @@ Ponto de entrada da aplicação.
 Integra NiceGUI em modo nativo (desktop).
 """
 
-import asyncio
-import uuid
-import platform
-import psutil
-
 from nicegui import app, ui
 
 from app.core.config import settings
 from app.core.logger import app_logger
-from app.core.device_id import device_manager
-from app.core.constants import EventType
-from app.infrastructure.database import db_manager
-from app.workers.sync_worker import sync_worker
 
 from app.ui.pages.dashboard import ValidationDashboard
 from app.api.endpoints import router as api_router

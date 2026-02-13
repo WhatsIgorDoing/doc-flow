@@ -18,20 +18,9 @@ class Settings(BaseSettings):
     DEBUG: bool = False
     SECRET_KEY: str = ""  # OBRIGATÓRIO: Definir via .env (gerar com: python -c "import secrets; print(secrets.token_urlsafe(32))")
 
-    # Supabase (defaults seguros para dev - sem conexão real)
-    SUPABASE_URL: str = "https://your-project.supabase.co"
-    SUPABASE_KEY: str = "your-anon-key-here"
-    SUPABASE_ENABLED: bool = False  # Desabilitado por padrão em dev
-
     # Database
     DATABASE_PATH: str = "./data/sad_app.db"
     DATABASE_ECHO: bool = False  # SQL logging
-
-    # Sync Worker
-    SYNC_INTERVAL_SECONDS: int = 60
-    SYNC_BATCH_SIZE: int = 100
-    SYNC_RETRY_MAX_ATTEMPTS: int = 3
-    SYNC_ENABLED: bool = True
 
     # Logging
     LOG_LEVEL: str = "INFO"

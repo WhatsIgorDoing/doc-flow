@@ -17,37 +17,9 @@ from app.domain.entities import (
     DocumentGroup,
     OrganizationResult,
 )
+from app.domain.file_naming import get_filename_with_revision
 
 
-def _get_filename_with_revision(original_filename: str, revision: str) -> str:
-    """
-    Constrói o nome do arquivo com a revisão adicionada antes da extensão.
-    Verifica se a revisão já existe no nome para evitar duplicação.
-
-    Exemplo:
-    - "arquivo.pdf" + "A" -> "arquivo_A.pdf"
-    - "arquivo_A.pdf" + "A" -> "arquivo_A.pdf" (não duplica)
-    - "arquivo" + "B" -> "arquivo_B"
-    """
-    name_parts = original_filename.rsplit(".", 1)
-
-    if len(name_parts) == 2:
-        base_name, extension = name_parts
-        # Verificar se já termina com _revisão
-        if base_name.endswith(f"_{revision}"):
-            # Já tem a revisão correta, retornar como está
-            return original_filename
-        else:
-            # Adicionar a revisão
-            return f"{base_name}_{revision}.{extension}"
-    else:
-        # Arquivo sem extensão
-        if original_filename.endswith(f"_{revision}"):
-            # Já tem a revisão correta, retornar como está
-            return original_filename
-        else:
-            # Adicionar a revisão
-            return f"{original_filename}_{revision}"
 
 
 class OrganizeLotsUseCase:
@@ -154,7 +126,7 @@ class OrganizeLotsUseCase:
                         revision = manifest_item.revision if manifest_item else "0"
 
                         # Construir novo nome do arquivo com revisão
-                        new_filename = _get_filename_with_revision(
+                        new_filename = get_filename_with_revision(
                             file.path.name, revision
                         )
 

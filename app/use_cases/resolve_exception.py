@@ -10,6 +10,7 @@ from app.core.logger import app_logger
 from app.core.interfaces import (
     ICodeExtractor,
     IContentExtractor,
+    IFileSystemManager,
     CodeNotInManifestError,
     ExtractionFailedError,
 )
@@ -18,6 +19,7 @@ from app.domain.entities import (
     DocumentStatus,
     ManifestItem,
 )
+from app.domain.file_naming import get_filename_with_revision
 
 
 class ResolveExceptionUseCase:
@@ -26,13 +28,15 @@ class ResolveExceptionUseCase:
     def __init__(
         self,
         content_extractor: IContentExtractor,
-        code_extractor: ICodeExtractor
+        code_extractor: ICodeExtractor,
+        file_manager: IFileSystemManager,
     ):
         """
-        Inicializa com serviços de extração.
+        Inicializa com serviços de extração e gerenciador de arquivos.
         """
         self._content_extractor = content_extractor
         self._code_extractor = code_extractor
+        self._file_manager = file_manager
 
     def _sanitize_code(self, code: str) -> str:
         """
@@ -106,9 +110,22 @@ class ResolveExceptionUseCase:
             file_to_resolve.status = DocumentStatus.VALIDATED
             file_to_resolve.associated_manifest_item = matched_item
 
+            # 6. Renomeação Física
+            expected_name = get_filename_with_revision(
+                matched_item.document_code + file_to_resolve.path.suffix,
+                matched_item.revision
+            )
+            new_path = await self._file_manager.rename_file(
+                file_to_resolve.path, expected_name
+            )
+            file_to_resolve.path = new_path
+
             app_logger.info(
                 "Arquivo resolvido com sucesso",
-                extra={"code": sanitized_code}
+                extra={
+                    "code": sanitized_code,
+                    "new_path": str(new_path),
+                }
             )
 
             return file_to_resolve

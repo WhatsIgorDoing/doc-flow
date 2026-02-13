@@ -4,6 +4,7 @@ Implementa padrão Repository com I/O não bloqueante.
 """
 
 import asyncio
+import os
 from pathlib import Path
 from typing import List
 
@@ -73,6 +74,7 @@ class ManifestRepository(IManifestRepository):
     def _read_excel_sync(self, file_path: Path) -> List[ManifestItem]:
         """
         Leitura síncrona do Excel (executada em thread pool).
+        Suporta formato dinâmico detectando cabeçalho.
 
         Args:
             file_path: Caminho do arquivo Excel
@@ -80,40 +82,135 @@ class ManifestRepository(IManifestRepository):
         Returns:
             Lista de itens do manifesto
         """
-        workbook = openpyxl.load_workbook(file_path, read_only=True)
+        workbook = openpyxl.load_workbook(file_path, read_only=True, data_only=True)
         sheet: Worksheet = workbook.active
 
         items: List[ManifestItem] = []
 
-        # Obtém cabeçalho (primeira linha)
-        header = [cell.value for cell in sheet[1]]
+        # Configurações de detecção
+        MAX_HEADER_SCAN = 20
+        header_row_idx = 0
+        
+        # Mapa de colunas (nome -> índice)
+        col_map = {}
+        
+        # Palavras-chave para identificar colunas (lower case)
+        KEYWORDS = {
+            'document_code': ['documento', 'código', 'codigo', 'code', 'doc'],
+            'revision': ['revisão', 'revisao', 'rev', 'revision'],
+            'title': ['título', 'titulo', 'title', 'descrição', 'descricao']
+        }
 
-        # Itera sobre as linhas, pulando o cabeçalho
-        for row in sheet.iter_rows(min_row=2, values_only=True):
-            # Ignora linhas vazias
+        # 1. Detectar linha de cabeçalho (Melhor Match)
+        best_header_row = 0
+        best_col_map = {}
+        max_matches = 0
+
+        for i, row in enumerate(sheet.iter_rows(min_row=1, max_row=MAX_HEADER_SCAN, values_only=True), 1):
+            row_values = [str(cell).lower().strip() if cell else "" for cell in row]
+            
+            # Tenta encontrar colunas obrigatórias
+            found_cols = {}
+            for target_field, keywords in KEYWORDS.items():
+                for idx, cell_res in enumerate(row_values):
+                    if any(k == cell_res or k in cell_res for k in keywords):
+                        # Evitar sobrescrever se já encontrou match exato/melhor
+                        if target_field not in found_cols:
+                            found_cols[target_field] = idx
+                        elif cell_res in keywords: # Prioridade para match exato
+                            found_cols[target_field] = idx
+            
+            # Pontuação: Quantas colunas obrigatórias encontrou
+            match_count = len(found_cols)
+
+            # Critério de seleção:
+            # 1. Deve ter 'document_code'
+            # 2. Deve ter mais matches que o anterior
+            # 3. Se empate, prefere o que tem mais matches exatos (opcional, aqui simplificado)
+            if 'document_code' in found_cols and match_count >= 2:
+                if match_count > max_matches:
+                    max_matches = match_count
+                    best_header_row = i
+                    best_col_map = found_cols
+        
+        if best_header_row > 0:
+            header_row_idx = best_header_row
+            col_map = best_col_map
+            app_logger.info(f"Header detected at row {header_row_idx}. Map: {col_map} (Matches: {max_matches})")
+        
+        # Fallback: Se não detectou cabeçalho, assume formato legado (A=Code, B=Rev, C=Title, Row 1=Header)
+        if not header_row_idx:
+            header_row_idx = 1
+            col_map = {'document_code': 0, 'revision': 1, 'title': 2}
+            app_logger.warning("Header not detected dynamically, using legacy fallback (A=Code, B=Rev, C=Title)")
+
+        # Obter lista de cabeçalhos para metadados
+        # Precisamos ler a linha de cabeçalho novamente para ter os nomes originais
+        header_cells = []
+        for row in sheet.iter_rows(min_row=header_row_idx, max_row=header_row_idx, values_only=True):
+            header_cells = [str(cell).strip() if cell else f"Column_{i}" for i, cell in enumerate(row)]
+            break
+
+        # 2. Ler dados
+        for row in sheet.iter_rows(min_row=header_row_idx + 1, values_only=True):
+            # Ignora linhas totalmente vazias
             if not any(row):
                 continue
+            
+            # Extrair campos principais usando o mapa
+            try:
+                # Code
+                idx_code = col_map.get('document_code')
+                raw_code = row[idx_code] if idx_code is not None and idx_code < len(row) else None
+                document_code = str(raw_code).strip() if raw_code else ""
+                
+                # Ignora se não tiver código (linha inválida ou de formatação)
+                if not document_code or len(document_code) < 3:
+                     continue
 
-            # Mapeamento de colunas: A=0 (code), B=1 (revision), C=2 (title)
-            document_code = str(row[0]) if row[0] else ""
-            revision = str(row[1]) if row[1] else "0"
-            title = str(row[2]) if row[2] else ""
+                # Validar se é um código real (ex: ignorar linhas que repetem cabeçalho ou são notas)
+                # Heurística simples: não deve ser igual ao nome da coluna
+                # E também não deve ser igual keywords de outras colunas (ex: "Revisão")
+                is_header_repeat = False
+                doc_lower = document_code.lower()
+                for k_list in KEYWORDS.values():
+                    if doc_lower in k_list:
+                        is_header_repeat = True
+                        break
+                
+                if is_header_repeat:
+                    continue
 
-            # Coleta metadados extras a partir da coluna D (índice 3)
-            metadata = {
-                header[i]: row[i]
-                for i in range(3, len(row))
-                if i < len(header) and row[i] is not None
-            }
+                # Revision
+                idx_rev = col_map.get('revision')
+                raw_rev = row[idx_rev] if idx_rev is not None and idx_rev < len(row) else None
+                revision = str(raw_rev).strip() if raw_rev else "0"
+                
+                # Title
+                idx_title = col_map.get('title')
+                raw_title = row[idx_title] if idx_title is not None and idx_title < len(row) else None
+                title = str(raw_title).strip() if raw_title else ""
 
-            items.append(
-                ManifestItem(
-                    document_code=document_code,
-                    revision=revision,
-                    title=title,
-                    metadata=metadata,
+                # Metadata: tudo que não é coluna principal mapeada
+                metadata = {}
+                main_indices = set(col_map.values())
+                for i, val in enumerate(row):
+                    if i not in main_indices and i < len(header_cells) and val is not None:
+                        metadata[header_cells[i]] = val
+                
+                items.append(
+                    ManifestItem(
+                        document_code=document_code,
+                        revision=revision,
+                        title=title,
+                        metadata=metadata,
+                    )
                 )
-            )
+
+            except Exception as e:
+                # Logar e continuar (best effort)
+                app_logger.warning(f"Error parsing row in manifest: {e}", extra={"row_content": str(row)[:100]})
+                continue
 
         workbook.close()
         return items
@@ -293,3 +390,71 @@ class FileSystemManager(IFileSystemManager):
                 },
             )
             raise FileOperationError(f"Failed to copy {source} to {destination}: {e}")
+
+    async def rename_file(self, source: Path, new_name: str) -> Path:
+        """
+        Renomeia um arquivo de forma segura, resolvendo conflitos de nome.
+
+        Args:
+            source: Caminho do arquivo de origem
+            new_name: Novo nome do arquivo (apenas nome, não caminho)
+
+        Returns:
+            Caminho final do arquivo renomeado
+
+        Raises:
+            FileOperationError: Se o arquivo não existir, sem permissão, ou erro ao renomear
+        """
+        if not source.exists():
+            raise FileOperationError(f"Source file does not exist: {source}")
+
+        if not source.is_file():
+            raise FileOperationError(f"Source is not a file: {source}")
+
+        target = source.parent / new_name
+
+        try:
+            # Resolver conflito de nome se destino já existe
+            if target.exists() and target != source:
+                from app.domain.file_naming import generate_unique_filename
+
+                original_target = target
+                target = generate_unique_filename(target)
+                app_logger.info(
+                    "File name conflict resolved",
+                    extra={
+                        "original_target": str(original_target),
+                        "resolved_target": str(target),
+                    },
+                )
+
+            # Verificar permissão de escrita no diretório
+            if not os.access(source.parent, os.W_OK):
+                raise FileOperationError(
+                    f"No write permission in directory: {source.parent}"
+                )
+
+            # Renomear em thread pool
+            loop = asyncio.get_event_loop()
+            await loop.run_in_executor(None, source.rename, target)
+
+            app_logger.debug(
+                "File renamed",
+                extra={"source": str(source), "target": str(target)},
+            )
+
+            return target
+
+        except FileOperationError:
+            raise
+        except Exception as e:
+            app_logger.error(
+                "Failed to rename file",
+                extra={
+                    "source": str(source),
+                    "new_name": new_name,
+                    "error": str(e),
+                },
+            )
+            raise FileOperationError(f"Failed to rename {source} to {new_name}: {e}")
+

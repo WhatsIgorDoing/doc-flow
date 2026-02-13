@@ -21,22 +21,7 @@ from app.domain.exceptions import (
     TemplateFillError,
     TemplateNotFoundError,
 )
-
-
-def _get_filename_with_revision(original_filename: str, revision: str) -> str:
-    """Adaptação do helper local para ser usado na geração."""
-    # ... mesma lógica do use case ou importar de lá?
-    # Melhor isolar aqui para evitar dependência circular se houver.
-    name_parts = original_filename.rsplit(".", 1)
-    if len(name_parts) == 2:
-        base_name, extension = name_parts
-        if base_name.endswith(f"_{revision}"):
-            return original_filename
-        return f"{base_name}_{revision}.{extension}"
-    else:
-        if original_filename.endswith(f"_{revision}"):
-            return original_filename
-        return f"{original_filename}_{revision}"
+from app.domain.file_naming import get_filename_with_revision
 
 
 class OpenpyxlTemplateFiller(ITemplateFiller):
@@ -107,7 +92,7 @@ class OpenpyxlTemplateFiller(ITemplateFiller):
 
             for file in group.files:
                 revision = manifest_info.revision
-                filename_with_revision = _get_filename_with_revision(
+                filename_with_revision = get_filename_with_revision(
                     file.path.name, revision
                 )
 

@@ -8,7 +8,7 @@ from nicegui import ui, run
 
 from app.core.logger import app_logger
 from app.domain.exceptions import SADError
-from app.infrastructure.repositories import FileRepository, ManifestRepository
+from app.infrastructure.repositories import FileRepository, FileSystemManager, ManifestRepository
 from app.services.validation_service import ValidationService
 
 # Import New Design System
@@ -26,9 +26,10 @@ class ValidationDashboard:
         self.manifest_path: Optional[str] = None
         self.source_directory: Optional[str] = None
         self.is_validating: bool = False
-        
+        self._manifest_items = []  # Cached from last validation
+
         # Refs
-        self.results_section = None 
+        self.results_section = None
         self.status_label = None
 
     async def pick_manifest(self):
@@ -114,6 +115,13 @@ class ValidationDashboard:
             self._update_status(f"Concluído: {len(result.validated_files)} validados, {len(result.unrecognized_files)} desconhecidos.")
             
             ui.notify("Validação Concluída com Sucesso!", type="positive")
+
+            # Cache manifest items for resolution
+            self._manifest_items = [
+                f.associated_manifest_item
+                for f in result.validated_files
+                if f.associated_manifest_item
+            ]
             
         except Exception as e:
             err_msg = str(e)
@@ -138,6 +146,53 @@ class ValidationDashboard:
             
         finally:
             self.btn_validate.props(remove="loading")
+
+    async def resolve_selected(self, selected_files):
+        """Resolves selected unrecognized files via UC-02."""
+        from app.infrastructure.extraction import ProfiledExtractorService
+        from app.use_cases.resolve_exception import ResolveExceptionUseCase
+
+        if not selected_files:
+            return
+
+        config_path = Path("config/patterns.yaml")
+        extractor = ProfiledExtractorService(config_path)
+        file_manager = FileSystemManager()
+
+        use_case = ResolveExceptionUseCase(
+            content_extractor=extractor,
+            code_extractor=extractor,
+            file_manager=file_manager,
+        )
+
+        success_count = 0
+        fail_count = 0
+
+        for file in selected_files:
+            try:
+                await use_case.execute(
+                    file_to_resolve=file,
+                    profile_id="RIR",
+                    all_manifest_items=self._manifest_items,
+                )
+                success_count += 1
+            except Exception as e:
+                fail_count += 1
+                app_logger.warning(
+                    "Falha na resolução",
+                    extra={"file": file.path.name, "error": str(e)},
+                )
+
+        if success_count > 0:
+            ui.notify(
+                f"{success_count} arquivo(s) resolvido(s) com sucesso!",
+                type="positive",
+            )
+        if fail_count > 0:
+            ui.notify(
+                f"{fail_count} arquivo(s) não puderam ser resolvidos.",
+                type="warning",
+            )
 
     def render(self):
         """Renders the Premium Dashboard with improved UX."""
@@ -195,7 +250,7 @@ class ValidationDashboard:
 
 
                 # 3. Results Section
-                self.results_section = ResultsList()
+                self.results_section = ResultsList(on_resolve=self.resolve_selected)
 
 
 @ui.page("/")

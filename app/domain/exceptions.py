@@ -76,6 +76,12 @@ class FileOperationError(FileSystemError):
     pass
 
 
+class FileConflictError(FileSystemError):
+    """Erro quando o destino já existe e não pode ser sobrescrito."""
+
+    pass
+
+
 # === Exceções de Template ===
 
 

@@ -78,6 +78,10 @@ class IFileSystemManager(Protocol):
         """Copia um arquivo do local de origem para o destino."""
         ...
 
+    async def rename_file(self, source: Path, new_name: str) -> Path:
+        """Renomeia arquivo de forma segura, resolvendo conflitos de nome."""
+        ...
+
 
 class ITemplateFiller(Protocol):
     """Contrato para um serviço que preenche um template Excel."""
