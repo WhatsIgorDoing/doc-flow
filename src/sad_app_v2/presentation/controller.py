@@ -1,10 +1,12 @@
 """
 Controller for SAD App v2.
 """
+
 from pathlib import Path
 from typing import Any
 
 from app.use_cases.validate_batch import ValidateBatchUseCase
+
 
 class Controller:
     """

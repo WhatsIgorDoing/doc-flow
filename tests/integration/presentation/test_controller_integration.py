@@ -12,6 +12,7 @@ from app.use_cases.validate_batch import ValidateBatchUseCase
 from app.infrastructure.repositories import ManifestRepository, FileRepository
 from app.domain.entities import ValidationResult
 
+
 @pytest.mark.asyncio
 async def test_controller_integration_success():
     """
@@ -56,8 +57,12 @@ async def test_controller_integration_success():
     mock_view.after.assert_called_once()
     # Verifica argumentos passados para o after
     args = mock_view.after.call_args[0]
-    result_passed = args[2] # (delay, callback, result)
+    result_passed = args[2]  # (delay, callback, result)
 
     # O resultado deve ser validado (instância de ValidationResult)
-    assert isinstance(result_passed, ValidationResult), "O resultado deve ser uma instância de ValidationResult"
-    assert not inspect.iscoroutine(result_passed), "O resultado não deve ser uma coroutine"
+    assert isinstance(
+        result_passed, ValidationResult
+    ), "O resultado deve ser uma instância de ValidationResult"
+    assert not inspect.iscoroutine(
+        result_passed
+    ), "O resultado não deve ser uma coroutine"
