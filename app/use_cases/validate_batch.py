@@ -31,6 +31,22 @@ class ValidateBatchUseCase:
         self._manifest_repo = manifest_repo
         self._file_repo = file_repo
 
+    REVISION_PATTERNS = [
+        re.compile(p, re.IGNORECASE)
+        for p in [
+            r"_[A-Z]$",  # _A, _B, _C, etc.
+            r"_Rev\d+$",  # _Rev0, _Rev1, _Rev2, etc.
+            r"_rev\d+$",  # _rev0, _rev1, _rev2, etc.
+            r"_\d+$",  # _0, _1, _2, etc.
+            r"_final$",  # _final
+            r"_temp$",  # _temp
+            r"_old$",  # _old
+            r"_backup$",  # _backup
+            r"_draft$",  # _draft
+            r"_preliminary$",  # _preliminary
+        ]
+    ]
+
     def _get_file_base_name(self, file_name: str) -> str:
         """
         Extrai o nome base de um arquivo para correspondência seguindo RN-NEW-001.
@@ -44,25 +60,11 @@ class ValidateBatchUseCase:
         """
         name_without_ext = Path(file_name).stem
 
-        # Padrões de sufixos de revisão típicos
-        revision_patterns = [
-            r"_[A-Z]$",  # _A, _B, _C, etc.
-            r"_Rev\d+$",  # _Rev0, _Rev1, _Rev2, etc.
-            r"_rev\d+$",  # _rev0, _rev1, _rev2, etc.
-            r"_\d+$",  # _0, _1, _2, etc.
-            r"_final$",  # _final
-            r"_temp$",  # _temp
-            r"_old$",  # _old
-            r"_backup$",  # _backup
-            r"_draft$",  # _draft
-            r"_preliminary$",  # _preliminary
-        ]
-
         # Verifica se há um sufixo de revisão no final
-        for pattern in revision_patterns:
-            if re.search(pattern, name_without_ext, re.IGNORECASE):
+        for pattern in self.REVISION_PATTERNS:
+            if pattern.search(name_without_ext):
                 # Remove o sufixo encontrado
-                return re.sub(pattern, "", name_without_ext, flags=re.IGNORECASE)
+                return pattern.sub("", name_without_ext)
 
         # Se não encontrou nenhum sufixo conhecido, retorna o nome completo
         return name_without_ext
