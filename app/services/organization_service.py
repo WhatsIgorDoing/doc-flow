@@ -9,10 +9,10 @@ from app.domain.entities import (
     OrganizationResult,
 )
 from app.domain.exceptions import OrganizationError
+from app.infrastructure.database import DatabaseManager
 from app.infrastructure.repositories import FileSystemManager
 from app.infrastructure.services import GreedyLotBalancerService
 from app.infrastructure.template_filler import OpenpyxlTemplateFiller
-from app.infrastructure.database import DatabaseManager
 from app.use_cases.organize_lots import OrganizeLotsUseCase
 
 

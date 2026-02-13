@@ -1,7 +1,9 @@
-import pytest
-from app.infrastructure.services import GreedyLotBalancerService
-from app.domain.entities import DocumentGroup, DocumentFile, OutputLot
 from pathlib import Path
+
+import pytest
+
+from app.domain.entities import DocumentFile, DocumentGroup, OutputLot
+from app.infrastructure.services import GreedyLotBalancerService
 
 
 class TestGreedyLotBalancerService:

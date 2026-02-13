@@ -1,12 +1,7 @@
 from pathlib import Path
 from typing import List, Optional, Protocol
 
-from app.domain.entities import (
-    DocumentFile,
-    DocumentGroup,
-    ManifestItem,
-    OutputLot,
-)
+from app.domain.entities import DocumentFile, DocumentGroup, ManifestItem, OutputLot
 from app.domain.exceptions import (
     CodeNotInManifestError,
     ExtractionFailedError,
