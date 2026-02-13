@@ -47,7 +47,18 @@ class GreedyLotBalancerService(ILotBalancerService):
 
         # 4. Distribui os grupos para o lote atualmente mais leve (em bytes)
         for group in sorted_groups:
-            lightest_lot = min(lots, key=lambda lot: lot.total_size_bytes)
+            # Encontra o lote com o menor tamanho total em bytes,
+            # respeitando o limite de documentos por lote
+            candidate_lots = [
+                lot for lot in lots if len(lot.groups) < max_docs_per_lot
+            ]
+
+            # Fallback de segurança: se por algum erro de cálculo não houver lotes disponíveis,
+            # usa todos os lotes (evita crash, mas pode violar a regra de quantidade)
+            if not candidate_lots:
+                candidate_lots = lots
+
+            lightest_lot = min(candidate_lots, key=lambda lot: lot.total_size_bytes)
             lightest_lot.groups.append(group)
 
         return lots
