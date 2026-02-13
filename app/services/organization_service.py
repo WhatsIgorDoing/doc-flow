@@ -65,9 +65,11 @@ class OrganizationService:
             doc = DocumentFile(
                 path=Path(v_doc.path),
                 size_bytes=v_doc.size_bytes,
-                status=DocumentStatus(v_doc.status)
-                if v_doc.status
-                else DocumentStatus.UNVALIDATED,
+                status=(
+                    DocumentStatus(v_doc.status)
+                    if v_doc.status
+                    else DocumentStatus.UNVALIDATED
+                ),
             )
             # Reconstruir ManifestItem se disponível
             if v_doc.document_code:
