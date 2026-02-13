@@ -11,8 +11,11 @@ from pydantic import BaseModel, Field, field_validator
 
 from app.core.logger import app_logger
 from app.domain.exceptions import SADError
-from app.infrastructure.repositories import (FileRepository, FileSystemManager,
-                                             ManifestRepository)
+from app.infrastructure.repositories import (
+    FileRepository,
+    FileSystemManager,
+    ManifestRepository,
+)
 from app.services.organization_service import OrganizationService
 from app.services.validation_service import ValidationService
 
