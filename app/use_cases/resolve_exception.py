@@ -77,9 +77,7 @@ class ResolveExceptionUseCase:
             )
 
             # 1. Extração de Conteúdo (IO Bound - Async)
-            text = await self._content_extractor.extract_text(
-                file_to_resolve, profile_id
-            )
+            text = await self._content_extractor.extract_text(file_to_resolve)
 
             # 2. Extração de Código (CPU Bound - pode ser síncrono ou async, assumindo async pela interface)
             found_code = await self._code_extractor.find_code(text, profile_id)

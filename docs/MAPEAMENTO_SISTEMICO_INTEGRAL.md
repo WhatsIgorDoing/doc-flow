@@ -530,7 +530,7 @@ class OrganizationResult:
            └─ Se UNRECOGNIZED:
                ↓
                ResolveUnrecognizedFileUseCase.execute()
-               B1. ProfiledExtractorService.extract_text(file, "RIR")
+               B1. ProfiledExtractorService.extract_text(file)
                    → Se .pdf: PyPDF2.PdfReader → extrai texto de todas páginas
                    → Se .docx: python-docx.Document → concatena parágrafos
                    → Retorna: texto completo (string)

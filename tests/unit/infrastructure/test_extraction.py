@@ -56,7 +56,7 @@ async def test_extract_text_pdf(mock_pdf_reader):
     # Execução
     # Precisamos mockar o open() pois o service tenta abrir o arquivo
     with patch("builtins.open", new_callable=MagicMock):
-        text = await service.extract_text(file, "ANY")
+        text = await service.extract_text(file)
 
     # Verificação
     assert text == "Conteúdo do PDF"
@@ -74,7 +74,7 @@ async def test_extract_text_docx(mock_docx_document):
     file = DocumentFile(path=Path("test.docx"), size_bytes=0)
 
     # Execução
-    text = await service.extract_text(file, "ANY")
+    text = await service.extract_text(file)
 
     # Verificação
     assert text == "Conteúdo do DOCX"

@@ -41,8 +41,8 @@ class IFileRepository(Protocol):
 class IContentExtractor(Protocol):
     """Contrato para um serviço que extrai conteúdo textual de um arquivo."""
 
-    async def extract_text(self, file: DocumentFile, profile_id: str) -> str:
-        """Extrai texto de um arquivo usando uma estratégia de perfil."""
+    async def extract_text(self, file: DocumentFile) -> str:
+        """Extrai texto de um arquivo."""
         ...
 
 

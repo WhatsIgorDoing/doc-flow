@@ -47,7 +47,7 @@ class ProfiledExtractorService(IContentExtractor, ICodeExtractor):
             )
             return {}
 
-    async def extract_text(self, file: DocumentFile, profile_id: str) -> str:
+    async def extract_text(self, file: DocumentFile) -> str:
         """
         Extrai texto de um arquivo (PDF ou DOCX) de forma assíncrona.
         Usa thread pool para não bloquear o event loop durante I/O e processamento.
@@ -64,7 +64,7 @@ class ProfiledExtractorService(IContentExtractor, ICodeExtractor):
                     None, self._extract_text_from_docx, file.path
                 )
             else:
-                # Se o perfil precisar, podemos adicionar outros extratores (txt, etc.)
+                # Futuro: adicionar outros extratores se necessário
                 return ""
         except Exception as e:
             app_logger.error(
