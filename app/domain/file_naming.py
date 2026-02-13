@@ -4,6 +4,7 @@ Consolida helpers que estavam duplicados em organize_lots.py e template_filler.p
 """
 
 from pathlib import Path
+import time
 
 
 def get_filename_with_revision(original_filename: str, revision: str) -> str:
@@ -58,7 +59,5 @@ def generate_unique_filename(target_path: Path) -> Path:
             return candidate
 
     # Fallback extremo: praticamente impossível chegar aqui
-    import time
-
     ts = int(time.time())
     return parent / f"{stem}_{ts}{suffix}"
