@@ -1,0 +1,3 @@
+"""
+Constantes globais da aplicação.
+"""

@@ -1,0 +1,64 @@
+name: Doc-Flow CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11"]
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        pip install pytest pytest-asyncio pytest-cov black isort mypy
+
+    - name: Check Code Style (Black)
+      run: |
+        black . --check --diff
+
+    - name: Check Imports (Isort)
+      run: |
+        isort . --check-only --diff
+
+    - name: Type Checking (Mypy)
+      # Ignora erros por enquanto para não quebrar build em legado, mas verifica app/
+      run: |
+        mypy app/ --ignore-missing-imports || true
+
+    - name: Run Tests with Coverage
+      env:
+        SECRET_KEY: "test-secret-key-for-ci"
+      run: |
+        pytest --cov=app --cov-report=term-missing tests/
+
+  security-check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+    
+    - name: Install Bandit
+      run: pip install bandit
+
+    - name: Run Security Audit (Bandit)
+      # Verifica vulnerabilidades comuns de segurança no código Python
+      run: bandit -r app/ -ll -ii

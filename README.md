@@ -1,127 +1,173 @@
-# SAD_APP v2.0
+# SAD App - Sistema de Automação e Validação de Documentos
 
-**Sistema de Automação de Documentos**
+Aplicação desktop **Local-First** para validação de documentos PDF com sincronização de telemetria em nuvem.
 
-[![Python](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/)
-[![Tests](https://img.shields.io/badge/Tests-43%2F43%20passing-brightgreen.svg)](./tests)
-[![Status](https://img.shields.io/badge/Status-Produção-success.svg)]()
-[![Architecture](https://img.shields.io/badge/Architecture-Clean-blue.svg)]()
+## 🏗️ Arquitetura
 
-Sistema desktop que automatiza a validação, reconciliação e organização de documentos técnicos de engenharia, comparando arquivos físicos contra manifestos Excel e organizando-os em lotes balanceados.
+### Stack Tecnológica
+- **Runtime**: Python 3.11+
+- **Interface**: NiceGUI (modo nativo/desktop)
+- **Backend**: FastAPI (acoplado no mesmo processo)
+- **Banco Local**: SQLite (via SQLModel)
+- **Nuvem**: Supabase (telemetria e logs)
+- **Build**: Pip + PyInstaller
 
----
+### Estrutura do Projeto
 
-## 🚀 Quick Start
+```
+app/
+├── core/           # Configurações globais, loggers, constantes
+├── domain/         # Modelos de dados e regras de negócio
+├── infrastructure/ # Acesso a banco, rede e Supabase
+├── ui/             # Interface NiceGUI (componentes e páginas)
+└── workers/        # Background tasks (sincronização)
+```
 
-### 1. Instalação
-```bash
-cd c:\Development\teste\sad_app_v2
+## 🚀 Instalação
+
+### 1. Criar ambiente virtual
+
+```powershell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+```
+
+### 2. Instalar dependências
+
+```powershell
 pip install -r requirements.txt
 ```
 
-### 2. Executar Aplicação
-```bash
-python -m src.sad_app_v2.presentation.main_view
+
+### 3. Configurar variáveis de ambiente
+
+Copie `.env.example` para `.env` e configure:
+
+```env
+# OBRIGATÓRIO: Gere uma chave segura
+SECRET_KEY=sua-chave-secreta-aqui
+
+# Supabase (opcional para desenvolvimento)
+SUPABASE_URL=https://seu-projeto.supabase.co
+SUPABASE_KEY=sua-chave-anon
+SUPABASE_ENABLED=true
 ```
 
-### 3. Executar Testes
-```bash
-pytest tests/ -v
+**Gerar SECRET_KEY seguro:**
+
+```powershell
+python -c "import secrets; print(secrets.token_urlsafe(32))"
 ```
 
----
+> ⚠️ **IMPORTANTE:** A aplicação **não iniciará** sem um `SECRET_KEY` válido configurado no `.env`.
 
-## ✨ Funcionalidades Principais
+### 4. Executar aplicação
 
-- ✅ **Validação Automática**: Compara arquivos contra manifesto Excel (reduz 95% do tempo manual)
-- 🔍 **OCR Inteligente**: Extrai códigos de documentos PDF/DOCX usando perfis configuráveis
-- 📦 **Organização de Lotes**: Balanceamento automático com algoritmo greedy
-- 🎨 **Interface Gráfica**: UI desktop moderna com CustomTkinter
-- 📊 **Rastreabilidade**: Logs completos para auditoria e conformidade
-
----
-
-## 🛠️ Stack Tecnológica
-
-**Core:**
-- Python 3.11.3
-- CustomTkinter (UI Desktop)
-- Clean Architecture (Hexagonal)
-
-**Processamento:**
-- openpyxl (Excel)
-- PyPDF2 → pypdf (PDF)
-- python-docx (DOCX)
-
-**Testes:**
-- pytest (100% cobertura)
-
----
-
-## 📚 Documentação Completa
-
-A documentação completa está organizada em [`/docs`](./docs/00_README.md):
-
-### 📖 Guias
-- [Guia do Usuário](./docs/03_guia_usuario.md) - Manual de uso
-- [Guia do Desenvolvedor](./docs/04_guia_desenvolvedor.md) - Setup e desenvolvimento
-
-### 🔍 Análises Técnicas
-- [Auditoria Técnica](./docs/09a_sumario_auditoria.md) - Stack, dependências e riscos
-- [Análise de Negócio](./docs/10a_resumo_visual_negocio.md) - Entidades e regras
-- [Resumo de Produto](./docs/11a_product_brief.md) - ROI e proposta de valor
-
-### 🏗️ Arquitetura
-- [Arquitetura do Sistema](./docs/05_arquitetura.md)
-- [Casos de Uso](./docs/06_casos_de_uso.md)
-
----
-
-## 📊 Status do Projeto
-
-| Aspecto                  | Status                  |
-| ------------------------ | ----------------------- |
-| **Versão**               | 2.0                     |
-| **Testes**               | ✅ 43/43 passando (100%) |
-| **Última Atualização**   | 26/01/2026              |
-| **Arquitetura**          | Clean Architecture      |
-| **Pronto para Produção** | ✅ Sim                   |
-
----
-
-## 💡 Uso Básico
-
-```python
-# UC-01: Validar Lote
-manifesto = "caminho/manifesto.xlsx"
-diretorio = "caminho/documentos/"
-validados, nao_reconhecidos = validar_lote(manifesto, diretorio)
-
-# UC-03: Organizar em Lotes
-organizar_lotes(
-    validados,
-    output_dir="caminho/saida/",
-    max_docs_per_lot=50
-)
+```powershell
+python -m app.main
 ```
 
----
 
-## 🤝 Contribuindo
+## 📊 Schema do Supabase
 
-Este projeto segue Clean Architecture e padrões de código definidos em [`@clean-code`](./docs/04_guia_desenvolvedor.md).
+### Tabela: `events`
 
-**Antes de contribuir:**
-1. Leia o [Guia do Desenvolvedor](./docs/04_guia_desenvolvedor.md)
-2. Execute todos os testes: `pytest tests/ -v`
-3. Verifique conformidade: `python .agent/scripts/checklist.py .`
+```sql
+CREATE TABLE events (
+    id BIGSERIAL PRIMARY KEY,
+    event_id UUID UNIQUE NOT NULL,
+    session_id UUID NOT NULL,
+    device_id UUID NOT NULL,
+    event_type TEXT NOT NULL,
+    timestamp TIMESTAMPTZ NOT NULL,
+    duration_ms INTEGER,
+    files_processed INTEGER,
+    error_message TEXT,
+    error_stack TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
 
----
+CREATE INDEX idx_events_device_id ON events(device_id);
+CREATE INDEX idx_events_session_id ON events(session_id);
+CREATE INDEX idx_events_timestamp ON events(timestamp);
+```
 
-## 📄 Licença
+## 🔄 Sincronização (Store-and-Forward)
 
-Projeto interno - Todos os direitos reservados.
+O sistema implementa sincronização automática:
 
----
+1. **Eventos são salvos localmente** (SQLite) imediatamente
+2. **Worker em background** verifica conexão a cada 60 segundos
+3. **Se online**, envia eventos pendentes para Supabase
+4. **Se falhar**, silencia o erro e tenta na próxima
+5. **Nunca trava** a aplicação principal
 
-**Desenvolvido com Clean Architecture e boas práticas de engenharia de software.**
+### Status de Sincronização
+
+- ✅ **Online + Sincronizado**: Todos os eventos foram enviados
+- 🟡 **Online + Pendentes**: Há eventos aguardando envio
+- 🔴 **Offline**: Sem conexão, eventos acumulando localmente
+
+## 🧪 Testes
+
+### Executar todos os testes
+
+```powershell
+python -m pytest
+```
+
+### Executar com cobertura
+
+```powershell
+python -m pytest --cov=app --cov=src --cov-report=html
+```
+
+### Executar apenas testes unitários
+
+```powershell
+python -m pytest tests/unit/
+```
+
+### Executar apenas testes de integração
+
+```powershell
+python -m pytest tests/integration/
+```
+
+**Status Atual:** 48 testes coletados, 47 passando (97.9% de sucesso)
+
+## 🛠️ Desenvolvimento
+
+### Executar em modo debug
+
+```powershell
+$env:LOG_LEVEL="DEBUG"
+python -m app.main
+```
+
+### Health Check
+
+Acesse `http://localhost:8080/health` para verificar status.
+
+## 📦 Build (Futuro)
+
+```powershell
+pyinstaller build_config.py
+```
+
+## 🔒 Privacidade
+
+**O que é logado:**
+- ✅ Performance (tempo de processamento)
+- ✅ Erros (stack traces)
+- ✅ Métricas de uso (quantidade de arquivos)
+- ✅ Informações do sistema (OS, memória)
+
+**O que NÃO é logado:**
+- ❌ Nomes de arquivos
+- ❌ Conteúdo de PDFs
+- ❌ Dados pessoais
+
+## 📝 Licença
+
+Proprietário - Uso interno apenas.

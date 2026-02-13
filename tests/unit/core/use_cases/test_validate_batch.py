@@ -1,11 +1,13 @@
+import pytest
 from pathlib import Path
-from unittest.mock import MagicMock
+from unittest.mock import AsyncMock, MagicMock
 
-from src.sad_app_v2.core.domain import DocumentFile, DocumentStatus, ManifestItem
-from src.sad_app_v2.core.use_cases.validate_batch import ValidateBatchUseCase
+from app.domain.entities import DocumentFile, DocumentStatus, ManifestItem
+from app.use_cases.validate_batch import ValidateBatchUseCase
 
 
-def test_validate_batch_happy_path():
+@pytest.mark.asyncio
+async def test_validate_batch_happy_path():
     """
     Testa o caminho feliz: alguns arquivos correspondem, outros não.
     """
@@ -24,22 +26,29 @@ def test_validate_batch_happy_path():
 
     # -- Criar Mocks dos Repositórios
     mock_manifest_repo = MagicMock()
-    mock_manifest_repo.load_from_file.return_value = [manifest_item1, manifest_item2]
+    # Usar AsyncMock ou return_value futuro para métodos async
+    mock_manifest_repo.load_from_file = AsyncMock(return_value=[manifest_item1, manifest_item2])
 
     mock_file_repo = MagicMock()
-    mock_file_repo.list_files.return_value = [file1, file2, file3]
+    mock_file_repo.list_files = AsyncMock(return_value=[file1, file2, file3])
 
     # 2. Execução: Instanciar e executar o caso de uso com os mocks
     use_case = ValidateBatchUseCase(
         manifest_repo=mock_manifest_repo, file_repo=mock_file_repo
     )
-    validated, unrecognized = use_case.execute(
+    
+    # O novo use case retorna um objeto ValidationResult, não uma tupla
+    result = await use_case.execute(
         manifest_path=Path("C:/fake/manifest.xlsx"), source_directory=Path("C:/fake/")
     )
 
     # 3. Verificação (Asserts)
+    validated = result.validated_files
+    unrecognized = result.unrecognized_files
+    
     assert len(validated) == 2
     assert len(unrecognized) == 1
+    assert result.success is True
 
     # Verifica se o status do arquivo não reconhecido está correto
     assert unrecognized[0].status == DocumentStatus.UNRECOGNIZED
@@ -52,7 +61,8 @@ def test_validate_batch_happy_path():
     assert validated[1].associated_manifest_item.document_code == "DOC-001"
 
 
-def test_validate_batch_all_files_match():
+@pytest.mark.asyncio
+async def test_validate_batch_all_files_match():
     """
     Testa o cenário onde todos os arquivos têm correspondência no manifesto.
     """
@@ -64,25 +74,27 @@ def test_validate_batch_all_files_match():
     file2 = DocumentFile(path=Path("C:/fake/DOC-002_B.docx"), size_bytes=200)
 
     mock_manifest_repo = MagicMock()
-    mock_manifest_repo.load_from_file.return_value = [manifest_item1, manifest_item2]
+    mock_manifest_repo.load_from_file = AsyncMock(return_value=[manifest_item1, manifest_item2])
 
     mock_file_repo = MagicMock()
-    mock_file_repo.list_files.return_value = [file1, file2]
+    mock_file_repo.list_files = AsyncMock(return_value=[file1, file2])
 
     # Execução
     use_case = ValidateBatchUseCase(
         manifest_repo=mock_manifest_repo, file_repo=mock_file_repo
     )
-    validated, unrecognized = use_case.execute(
+    result = await use_case.execute(
         manifest_path=Path("C:/fake/manifest.xlsx"), source_directory=Path("C:/fake/")
     )
 
     # Verificação
-    assert len(validated) == 2
-    assert len(unrecognized) == 0
+    assert len(result.validated_files) == 2
+    assert len(result.unrecognized_files) == 0
+    assert result.success is True
 
 
-def test_validate_batch_no_files_match():
+@pytest.mark.asyncio
+async def test_validate_batch_no_files_match():
     """
     Testa o cenário onde nenhum arquivo tem correspondência no manifesto.
     """
@@ -94,28 +106,29 @@ def test_validate_batch_no_files_match():
     file2 = DocumentFile(path=Path("C:/fake/DOC-888_B.docx"), size_bytes=200)
 
     mock_manifest_repo = MagicMock()
-    mock_manifest_repo.load_from_file.return_value = [manifest_item1, manifest_item2]
+    mock_manifest_repo.load_from_file = AsyncMock(return_value=[manifest_item1, manifest_item2])
 
     mock_file_repo = MagicMock()
-    mock_file_repo.list_files.return_value = [file1, file2]
+    mock_file_repo.list_files = AsyncMock(return_value=[file1, file2])
 
     # Execução
     use_case = ValidateBatchUseCase(
         manifest_repo=mock_manifest_repo, file_repo=mock_file_repo
     )
-    validated, unrecognized = use_case.execute(
+    result = await use_case.execute(
         manifest_path=Path("C:/fake/manifest.xlsx"), source_directory=Path("C:/fake/")
     )
 
     # Verificação
-    assert len(validated) == 0
-    assert len(unrecognized) == 2
-    assert all(file.status == DocumentStatus.UNRECOGNIZED for file in unrecognized)
+    assert len(result.validated_files) == 0
+    assert len(result.unrecognized_files) == 2
+    assert all(file.status == DocumentStatus.UNRECOGNIZED for file in result.unrecognized_files)
 
 
 def test_get_file_base_name():
     """
     Testa a função de extração do nome base do arquivo.
+    Nota: _get_file_base_name é síncrona, então não precisa de await.
     """
     use_case = ValidateBatchUseCase(manifest_repo=MagicMock(), file_repo=MagicMock())
 

@@ -45,8 +45,7 @@ wheels/
 pip-wheel-metadata/
 
 # Documentation Build Artifacts
-docs/_build/
-*.pdf
+
 
 # Logs
 *.log
@@ -71,3 +70,9 @@ scripts/
 *.pem
 secrets/
 .env
+
+# Runtime data
+data/
+*.db
+.device_id
+.agent
