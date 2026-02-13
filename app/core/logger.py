@@ -3,12 +3,12 @@ Sistema de logging estruturado (JSON) para facilitar análise.
 Logs locais em arquivo + stdout para debug.
 """
 
+import json
 import logging
 import sys
-from pathlib import Path
-from logging.handlers import RotatingFileHandler
-import json
 from datetime import datetime
+from logging.handlers import RotatingFileHandler
+from pathlib import Path
 from typing import Any
 
 from app.core.config import settings

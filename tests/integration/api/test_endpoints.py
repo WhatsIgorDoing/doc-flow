@@ -1,33 +1,19 @@
-import pytest
-from fastapi.testclient import TestClient
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from app.main import app
-from app.api.endpoints import get_validation_service, get_organization_service
+import pytest
+from fastapi.testclient import TestClient
+
+from app.api.endpoints import get_organization_service, get_validation_service
 from app.domain.entities import (
-    ValidationResult,
     DocumentFile,
     DocumentStatus,
     ManifestItem,
+    OrganizationResult,
+    ValidationResult,
 )
+from app.main import app
 
 client = TestClient(app)
-
-# Mocks Globais
-mock_validation_service = MagicMock()
-mock_organization_service = MagicMock()
-
-
-def override_get_validation_service():
-    return mock_validation_service
-
-
-def override_get_organization_service():
-    return mock_organization_service
-
-
-app.dependency_overrides[get_validation_service] = override_get_validation_service
-app.dependency_overrides[get_organization_service] = override_get_organization_service
 
 
 def test_health_check():
@@ -39,9 +25,13 @@ def test_health_check():
 
 
 @patch("pathlib.Path.exists", return_value=True)
-def test_validate_batch_success(mock_exists):
+@patch("app.api.endpoints.get_validation_service")
+def test_validate_batch_success(mock_get_service, mock_exists):
     """Testa validação com sucesso (200 OK)."""
-    # Configurar AsyncMock para o método chamado pelo endpoint
+    # Configurar Mock do Service
+    mock_service = MagicMock()
+    mock_get_service.return_value = mock_service
+
     valid_file = DocumentFile(path="c:/test/doc1.pdf", size_bytes=100)
     valid_file.status = DocumentStatus.VALIDATED
     valid_file.associated_manifest_item = ManifestItem("DOC1", "0", "Title")
@@ -55,9 +45,7 @@ def test_validate_batch_success(mock_exists):
         unrecognized_files=[],
     )
 
-    # Importante: O endpoint faz 'await service.validate_batch()'
-    # Portanto, validate_batch deve ser um AsyncMock que retorna o result
-    mock_validation_service.validate_batch = AsyncMock(return_value=result)
+    mock_service.validate_batch = AsyncMock(return_value=result)
 
     payload = {
         "manifest_path": "c:/data/manifest.xlsx",
@@ -73,36 +61,46 @@ def test_validate_batch_success(mock_exists):
     assert data["validated_count"] == 1
 
 
-def test_validate_batch_invalid_path():
+@patch("pathlib.Path.exists", return_value=False)
+def test_validate_batch_invalid_path(mock_exists):
     """Testa validação com caminhos inexistentes (422 Unprocessable Entity do Pydantic)."""
-    # Não mockamos exists aqui (ou mockamos como False se precisasse, mas o default é real IO)
-    # Como os caminhos não existem na maquina de teste, o validator deve falhar.
-
-    # Mas cuidado: Se algum outro teste mockou pathlib globally e não limpou...
-    # O patch decorator limpa.
-
     payload = {
         "manifest_path": "c:/ghost/manifest.xlsx",
         "source_directory": "c:/ghost/docs",
     }
 
-    # precisamos garantir que exists retorne False.
-    # Se rodar em ambiente onde paths nao existem, ok.
-    # Mas para ser deterministico, melhor mockar False.
-    with patch("pathlib.Path.exists", return_value=False):
-        response = client.post("/api/validate", json=payload)
+    response = client.post("/api/validate", json=payload)
 
     assert response.status_code == 422
 
 
-def test_organize_lots_not_implemented():
-    """Testa endpoint de organização (atualmente 501)."""
+@patch("app.api.endpoints.get_organization_service")
+def test_organize_lots_success(mock_get_service):
+    """Testa endpoint de organização com sucesso (200 OK)."""
+    # Configurar Mock do Service
+    mock_service = MagicMock()
+    mock_get_service.return_value = mock_service
+
+    result = OrganizationResult(
+        success=True, message="Lotes criados", lots_created=1, files_moved=10
+    )
+    mock_service.organize_session_lots = AsyncMock(return_value=result)
+
     payload = {
         "validated_files": ["c:/doc1.pdf"],
         "output_directory": "c:/output",
         "max_docs_per_lot": 100,
     }
 
-    response = client.post("/api/organize", json=payload)
+    # Deve mockar Path.exists para o output_directory se o endpoint verificar
+    # O endpoint verifica: if not output_dir.exists(): try mkdir.
+    # Podemos mockar Path.exists ou deixar falhar silenciosamente (warning logged)
+    # Como mockamos o service, o endpoint vai chamar o service de qualquer jeito.
 
-    assert response.status_code == 501
+    with patch("pathlib.Path.exists", return_value=True):
+        response = client.post("/api/organize", json=payload)
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["success"] is True
+    assert data["lots_created"] == 1

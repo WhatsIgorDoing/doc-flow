@@ -3,8 +3,8 @@ Módulo compartilhado para lógica de nomenclatura de arquivos.
 Consolida helpers que estavam duplicados em organize_lots.py e template_filler.py.
 """
 
-from pathlib import Path
 import time
+from pathlib import Path
 
 
 def get_filename_with_revision(original_filename: str, revision: str) -> str:
