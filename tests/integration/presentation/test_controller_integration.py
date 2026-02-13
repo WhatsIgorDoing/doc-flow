@@ -1,16 +1,17 @@
-import pytest
-import sys
-from unittest.mock import MagicMock, AsyncMock
-from pathlib import Path
 import inspect
+import sys
+from pathlib import Path
+from unittest.mock import AsyncMock, MagicMock
+
+import pytest
 
 # Adiciona o diretório src ao PYTHONPATH para encontrar sad_app_v2
 sys.path.append("src")
 
-from sad_app_v2.presentation.controller import Controller
-from app.use_cases.validate_batch import ValidateBatchUseCase
-from app.infrastructure.repositories import ManifestRepository, FileRepository
 from app.domain.entities import ValidationResult
+from app.infrastructure.repositories import FileRepository, ManifestRepository
+from app.use_cases.validate_batch import ValidateBatchUseCase
+from sad_app_v2.presentation.controller import Controller
 
 
 @pytest.mark.asyncio

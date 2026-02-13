@@ -4,6 +4,7 @@ Injects custom CSS for scrollbars, tracking, and glass effects.
 """
 
 from nicegui import ui
+
 from app.ui.theme.design_system import design
 
 
