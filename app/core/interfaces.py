@@ -1,17 +1,13 @@
 from pathlib import Path
 from typing import List, Optional, Protocol
 
-from app.domain.entities import DocumentFile, DocumentGroup, ManifestItem, OutputLot
-from app.domain.exceptions import (
-    CodeNotInManifestError,
-    ExtractionFailedError,
-    FileOperationError,
-    FileReadError,
-    ManifestReadError,
-    SourceDirectoryNotFoundError,
-    TemplateFillError,
-    TemplateNotFoundError,
-)
+from app.domain.entities import (DocumentFile, DocumentGroup, ManifestItem,
+                                 OutputLot)
+from app.domain.exceptions import (CodeNotInManifestError,
+                                   ExtractionFailedError, FileOperationError,
+                                   FileReadError, ManifestReadError,
+                                   SourceDirectoryNotFoundError,
+                                   TemplateFillError, TemplateNotFoundError)
 
 # ===== Interfaces (Protocols) =====
 

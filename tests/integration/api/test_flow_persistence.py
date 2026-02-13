@@ -6,12 +6,8 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.api.endpoints import get_organization_service, get_validation_service
-from app.domain.entities import (
-    DocumentFile,
-    DocumentStatus,
-    OrganizationResult,
-    ValidationResult,
-)
+from app.domain.entities import (DocumentFile, DocumentStatus,
+                                 OrganizationResult, ValidationResult)
 from app.infrastructure.database import DatabaseManager, db_manager
 from app.main import app
 from app.services.organization_service import OrganizationService

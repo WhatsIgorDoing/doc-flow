@@ -4,11 +4,8 @@ from pathlib import Path
 import pytest
 
 from app.infrastructure.database import DatabaseManager
-from app.infrastructure.repositories import (
-    FileRepository,
-    FileSystemManager,
-    ManifestRepository,
-)
+from app.infrastructure.repositories import (FileRepository, FileSystemManager,
+                                             ManifestRepository)
 from app.services.validation_service import ValidationService
 
 

@@ -10,18 +10,14 @@ from nicegui import run, ui
 
 from app.core.logger import app_logger
 from app.domain.exceptions import SADError
-from app.infrastructure.repositories import (
-    FileRepository,
-    FileSystemManager,
-    ManifestRepository,
-)
+from app.infrastructure.repositories import (FileRepository, FileSystemManager,
+                                             ManifestRepository)
 from app.services.validation_service import ValidationService
 from app.ui.components.atoms.button import AppleButton
 from app.ui.components.molecules.file_picker import FilePickerMolecule
 from app.ui.components.organisms.hero import HeroHeader
 from app.ui.components.organisms.results import ResultsList
 from app.ui.theme.design_system import design
-
 # Import New Design System
 from app.ui.theme.global_styles import apply_global_styles
 

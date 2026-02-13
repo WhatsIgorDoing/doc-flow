@@ -6,3 +6,4 @@
 - [x] Remover logs de erro obsoletos
 - [x] Executar suíte de testes completa
 - [x] Verificar resultados e relatar ao usuário
+- [ ] Corrigir formatação do código (Black/Isort) <!-- id: 6 -->

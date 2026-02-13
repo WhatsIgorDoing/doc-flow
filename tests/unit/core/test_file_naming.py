@@ -7,7 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from app.domain.file_naming import generate_unique_filename, get_filename_with_revision
+from app.domain.file_naming import (generate_unique_filename,
+                                    get_filename_with_revision)
 
 
 class TestGetFilenameWithRevision:

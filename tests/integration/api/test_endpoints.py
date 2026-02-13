@@ -4,13 +4,8 @@ import pytest
 from fastapi.testclient import TestClient
 
 from app.api.endpoints import get_organization_service, get_validation_service
-from app.domain.entities import (
-    DocumentFile,
-    DocumentStatus,
-    ManifestItem,
-    OrganizationResult,
-    ValidationResult,
-)
+from app.domain.entities import (DocumentFile, DocumentStatus, ManifestItem,
+                                 OrganizationResult, ValidationResult)
 from app.main import app
 
 client = TestClient(app)
