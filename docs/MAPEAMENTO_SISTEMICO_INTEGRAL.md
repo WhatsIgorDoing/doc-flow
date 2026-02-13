@@ -263,7 +263,7 @@ graph TD
 - **Atores:** `SafeFileSystemManager.move_file()`
 - **Dependências:**
   - F-010 (Estrutura criada)
-  - Função `_get_filename_with_revision()`
+  - Função `get_filename_with_revision()`
 - **Fluxo:**
   - Para cada arquivo no grupo: construir nome com revisão → mover para diretório do lote
   - Usa `shutil.move()` com tratamento de erros robusto
@@ -611,7 +611,7 @@ class OrganizationResult:
         Para cada group em lot.groups:
             Para cada file em group.files:
                 revision = file.associated_manifest_item.revision
-                new_filename = _get_filename_with_revision(file.path.name, revision)
+                new_filename = get_filename_with_revision(file.path.name, revision)
                 # Exemplo: "DOC-123.pdf" + "A" → "DOC-123_A.pdf"
                 destination = lot_directory / new_filename
                 SafeFileSystemManager.move_file(file.path, destination)
@@ -871,19 +871,6 @@ class DocumentFile:
 - Remover campo `_manifest_item` e propriedade de compatibilidade
 - Atualizar todos os usos para `associated_manifest_item` consistentemente
 
-#### 📝 Lógica de Negócio Duplicada
-**Localização:** `_get_filename_with_revision()` duplicada em dois arquivos
-
-**Evidência:**
-- `organize_lots.py` (linhas 9-38)
-- `template_filler.py` (linhas 8-37)
-
-Código idêntico copiado entre módulos. Violação do princípio DRY (Don't Repeat Yourself).
-
-**Ação Recomendada:**
-- Mover para módulo `utils` ou `domain`
-- Importar de local único em ambos os use cases
-
 #### 📝 Comentário Indicando Funcionalidade Não Implementada
 **Localização:** `controller.py` (linha 257)
 
@@ -1073,8 +1060,7 @@ except Exception as e:  # ❌ Catch-all muito amplo
 #### Curto Prazo (1-2 sprints)
 1. **Implementar transação atômica** em OrganizeAndGenerateLotsUseCase (CRÍTICO)
 2. **Adicionar validação de estrutura de manifesto** com mensagens de erro claras
-3. **Remover duplicação** da função `_get_filename_with_revision()`
-4. **Implementar logging estruturado** em arquivo
+3. **Implementar logging estruturado** em arquivo
 
 #### Médio Prazo (3-6 meses)
 1. **Adicionar cobertura de testes** para casos de erro (target: 80%)
