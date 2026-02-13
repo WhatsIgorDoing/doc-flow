@@ -133,20 +133,64 @@ async def test_validate_batch_no_files_match():
     )
 
 
-def test_get_file_base_name():
+@pytest.mark.parametrize(
+    "file_name, expected_base_name",
+    [
+        # Pattern: _[A-Z]$
+        ("DOC-001_A.pdf", "DOC-001"),
+        ("DOC-001_B.dwg", "DOC-001"),
+        ("DOC_C.pdf", "DOC"),
+
+        # Pattern: _Rev\d+$
+        ("DOC-001_Rev0.pdf", "DOC-001"),
+        ("DOC-001_Rev1.pdf", "DOC-001"),
+        ("DOC-001_Rev10.pdf", "DOC-001"),
+
+        # Pattern: _rev\d+$
+        ("DOC-001_rev0.pdf", "DOC-001"),
+        ("DOC-001_rev01.pdf", "DOC-001"),
+
+        # Pattern: _\d+$
+        ("DOC-001_0.pdf", "DOC-001"),
+        ("DOC-001_1.pdf", "DOC-001"),
+        ("DOC-001_123.pdf", "DOC-001"),
+
+        # Specific keywords
+        ("DOC-001_final.pdf", "DOC-001"),
+        ("DOC-001_temp.pdf", "DOC-001"),
+        ("DOC-001_old.pdf", "DOC-001"),
+        ("DOC-001_backup.pdf", "DOC-001"),
+        ("DOC-001_draft.pdf", "DOC-001"),
+        ("DOC-001_preliminary.pdf", "DOC-001"),
+
+        # Case Insensitive Check (implied by regex flags but good to verify if keywords are case sensitive in regex)
+        # The code uses re.IGNORECASE so these should work
+        ("DOC-001_FINAL.pdf", "DOC-001"),
+        ("DOC-001_TEMP.pdf", "DOC-001"),
+
+        # Files without suffixes
+        ("DOC-001.pdf", "DOC-001"),
+        ("DOC-002.dwg", "DOC-002"),
+
+        # Files with underscores but no valid suffix at the end
+        ("COMPLEX_DOC_NAME.pdf", "COMPLEX_DOC_NAME"),
+        ("DOC_WITH_UNDERSCORES.pdf", "DOC_WITH_UNDERSCORES"),
+
+        # Suffix-like patterns in the middle (should NOT be removed)
+        ("DOC_A_REPORT.pdf", "DOC_A_REPORT"),
+        ("DOC_Rev1_Part2.pdf", "DOC_Rev1_Part2"),
+        ("DOC_final_version.pdf", "DOC_final_version"),
+
+        # Edge cases
+        ("A.pdf", "A"), # Too short to have suffix? No, "A" is base name.
+        # Wait, if file is "A_B.pdf" -> "A"
+        ("A_B.pdf", "A"),
+    ],
+)
+def test_get_file_base_name_regex_patterns(file_name, expected_base_name):
     """
-    Testa a função de extração do nome base do arquivo.
-    Nota: _get_file_base_name é síncrona, então não precisa de await.
+    Testa a função de extração do nome base do arquivo com vários padrões de regex.
+    Cobre todos os casos definidos em ValidateBatchUseCase._get_file_base_name.
     """
     use_case = ValidateBatchUseCase(manifest_repo=MagicMock(), file_repo=MagicMock())
-
-    # Testa casos comuns
-    assert use_case._get_file_base_name("DOC-001_A.pdf") == "DOC-001"
-    assert use_case._get_file_base_name("DOC-002_B.dwg") == "DOC-002"
-    assert use_case._get_file_base_name("REPORT-123_rev1.docx") == "REPORT-123"
-
-    # Testa caso sem sufixo de revisão
-    assert use_case._get_file_base_name("DOC-003.pdf") == "DOC-003"
-
-    # Testa caso com múltiplos underscores
-    assert use_case._get_file_base_name("COMPLEX_DOC_NAME_A.pdf") == "COMPLEX_DOC_NAME"
+    assert use_case._get_file_base_name(file_name) == expected_base_name
