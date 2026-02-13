@@ -75,13 +75,15 @@ class ProfiledExtractorService(IContentExtractor, ICodeExtractor):
 
     def _extract_text_from_pdf(self, file_path: Path) -> str:
         """Lógica específica para extração de texto de PDF (CPU intensive)."""
-        text = ""
+        text_parts = []
         with open(file_path, "rb") as f:
             reader = PdfReader(f)
             # Extrai texto de todas as páginas
             for page in reader.pages:
-                text += page.extract_text() or ""
-        return text
+                extracted = page.extract_text()
+                if extracted:
+                    text_parts.append(extracted)
+        return "".join(text_parts)
 
     def _extract_text_from_docx(self, file_path: Path) -> str:
         """Lógica específica para extração de texto de DOCX (CPU intensive)."""
