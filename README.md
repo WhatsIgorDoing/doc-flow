@@ -1,6 +1,6 @@
-# SAD App - Sistema de Automação e Validação de Documentos
+# Doc Flow - Sistema de Automação e Validação de Documentos
 
-Aplicação desktop **Local-First** para validação de documentos PDF com sincronização de telemetria em nuvem.
+Aplicação desktop **Local-First** para validação e organização de documentos tecnici (PDFs) basedos em manifestos (Excel).
 
 ## 🏗️ Arquitetura
 
@@ -9,18 +9,18 @@ Aplicação desktop **Local-First** para validação de documentos PDF com sincr
 - **Interface**: NiceGUI (modo nativo/desktop)
 - **Backend**: FastAPI (acoplado no mesmo processo)
 - **Banco Local**: SQLite (via SQLModel)
-- **Nuvem**: Supabase (telemetria e logs)
 - **Build**: Pip + PyInstaller
 
 ### Estrutura do Projeto
 
 ```
 app/
-├── core/           # Configurações globais, loggers, constantes
+├── api/            # Endpoints REST (FastAPI)
+├── core/           # Configurações globais e loggers
 ├── domain/         # Modelos de dados e regras de negócio
-├── infrastructure/ # Acesso a banco, rede e Supabase
-├── ui/             # Interface NiceGUI (componentes e páginas)
-└── workers/        # Background tasks (sincronização)
+├── infrastructure/ # Repositórios (SQLite, Filesystem)
+├── services/       # Lógica de aplicação e orquestração
+└── ui/             # Interface NiceGUI (componentes e páginas)
 ```
 
 ## 🚀 Instalação
@@ -38,77 +38,28 @@ python -m venv venv
 pip install -r requirements.txt
 ```
 
-
-### 3. Configurar variáveis de ambiente
-
-Copie `.env.example` para `.env` e configure:
-
-```env
-# OBRIGATÓRIO: Gere uma chave segura
-SECRET_KEY=sua-chave-secreta-aqui
-
-# Supabase (opcional para desenvolvimento)
-SUPABASE_URL=https://seu-projeto.supabase.co
-SUPABASE_KEY=sua-chave-anon
-SUPABASE_ENABLED=true
-```
-
-**Gerar SECRET_KEY seguro:**
-
-```powershell
-python -c "import secrets; print(secrets.token_urlsafe(32))"
-```
-
-> ⚠️ **IMPORTANTE:** A aplicação **não iniciará** sem um `SECRET_KEY` válido configurado no `.env`.
-
-### 4. Executar aplicação
+### 3. Executar aplicação
 
 ```powershell
 python -m app.main
 ```
 
+A aplicação abrirá automaticamente no navegador padrão (modo nativo).
 
-## 📊 Schema do Supabase
+## 📊 Funcionalidades
 
-### Tabela: `events`
+1.  **Validação em Lote**:
+    - Importa documentos da LD do Excel (legacy e formato oficial `LD-5290...`).
+    - Valida existência e nomenclatura de arquivos PDF associados.
+    - Suporta detecção dinâmica de cabeçalhos em planilhas complexas.
 
-```sql
-CREATE TABLE events (
-    id BIGSERIAL PRIMARY KEY,
-    event_id UUID UNIQUE NOT NULL,
-    session_id UUID NOT NULL,
-    device_id UUID NOT NULL,
-    event_type TEXT NOT NULL,
-    timestamp TIMESTAMPTZ NOT NULL,
-    duration_ms INTEGER,
-    files_processed INTEGER,
-    error_message TEXT,
-    error_stack TEXT,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
+2.  **Organização**:
+    - Agrupa documentos validados em lotes otimizados (ex: por disciplina ou tamanho).
+    - Gera pacotes prontos para submissão.
 
-CREATE INDEX idx_events_device_id ON events(device_id);
-CREATE INDEX idx_events_session_id ON events(session_id);
-CREATE INDEX idx_events_timestamp ON events(timestamp);
-```
+## 🧪 Testes e QA
 
-## 🔄 Sincronização (Store-and-Forward)
-
-O sistema implementa sincronização automática:
-
-1. **Eventos são salvos localmente** (SQLite) imediatamente
-2. **Worker em background** verifica conexão a cada 60 segundos
-3. **Se online**, envia eventos pendentes para Supabase
-4. **Se falhar**, silencia o erro e tenta na próxima
-5. **Nunca trava** a aplicação principal
-
-### Status de Sincronização
-
-- ✅ **Online + Sincronizado**: Todos os eventos foram enviados
-- 🟡 **Online + Pendentes**: Há eventos aguardando envio
-- 🔴 **Offline**: Sem conexão, eventos acumulando localmente
-
-## 🧪 Testes
+O projeto possui uma suíte de testes robusta, incluindo validação com modelos reais.
 
 ### Executar todos os testes
 
@@ -116,25 +67,15 @@ O sistema implementa sincronização automática:
 python -m pytest
 ```
 
-### Executar com cobertura
+### Executar Testes de QA (Integração Oficial)
+
+Para verificar a compatibilidade com as planilhas oficiais (`docs/`):
 
 ```powershell
-python -m pytest --cov=app --cov=src --cov-report=html
+python -m pytest tests/integration/test_qa_official_models.py -v
 ```
 
-### Executar apenas testes unitários
-
-```powershell
-python -m pytest tests/unit/
-```
-
-### Executar apenas testes de integração
-
-```powershell
-python -m pytest tests/integration/
-```
-
-**Status Atual:** 48 testes coletados, 47 passando (97.9% de sucesso)
+Este teste garante que o sistema consegue ler e processar os modelos de engenharia reais, lidando com formatações variadas de cabeçalho.
 
 ## 🛠️ Desenvolvimento
 
@@ -147,26 +88,14 @@ python -m app.main
 
 ### Health Check
 
-Acesse `http://localhost:8080/health` para verificar status.
+Acesse `http://localhost:8080/health` para verificar o status do backend.
 
-## 📦 Build (Futuro)
+## 🔒 Privacidade (Local-First)
 
-```powershell
-pyinstaller build_config.py
-```
-
-## 🔒 Privacidade
-
-**O que é logado:**
-- ✅ Performance (tempo de processamento)
-- ✅ Erros (stack traces)
-- ✅ Métricas de uso (quantidade de arquivos)
-- ✅ Informações do sistema (OS, memória)
-
-**O que NÃO é logado:**
-- ❌ Nomes de arquivos
-- ❌ Conteúdo de PDFs
-- ❌ Dados pessoais
+Toda a operação é realizada localmente na máquina do usuário.
+- ❌ Nenhum dado é enviado para a nuvem.
+- ❌ Nenhuma telemetria externa.
+- ✅ Dados persistidos apenas no SQLite local (`data/app.db`).
 
 ## 📝 Licença
 
