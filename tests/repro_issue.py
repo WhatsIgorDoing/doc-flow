@@ -7,6 +7,7 @@ from app.infrastructure.template_filler import OpenpyxlTemplateFiller
 from app.domain.entities import DocumentGroup, DocumentFile, ManifestItem
 from app.core.interfaces import IFileSystemManager
 
+
 class MockFileSystemManager:
     async def create_directory(self, path: Path) -> None:
         pass
@@ -18,10 +19,12 @@ class MockFileSystemManager:
         # Simple copy for test using blocking IO wrapped in async if needed,
         # but here we just do it synchronously as it is a mock/test
         import shutil
+
         shutil.copy(source, destination)
 
     async def rename_file(self, source: Path, new_name: str) -> Path:
         return source.with_name(new_name)
+
 
 @pytest.mark.asyncio
 async def test_fill_and_save_inserts_rows_correctly(tmp_path):
@@ -45,17 +48,14 @@ async def test_fill_and_save_inserts_rows_correctly(tmp_path):
             document_code=f"DOC-{i}",
             revision=f"A",
             title=f"Title {i}",
-            metadata={"FORMATO": "A4"}
+            metadata={"FORMATO": "A4"},
         )
         doc_file = DocumentFile(
             path=Path(f"doc_{i}.pdf"),
             size_bytes=100,
-            associated_manifest_item=manifest_item
+            associated_manifest_item=manifest_item,
         )
-        group = DocumentGroup(
-            document_code=f"DOC-{i}",
-            files=[doc_file]
-        )
+        group = DocumentGroup(document_code=f"DOC-{i}", files=[doc_file])
         groups.append(group)
 
     # Mock File Manager
