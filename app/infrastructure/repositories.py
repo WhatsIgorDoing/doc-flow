@@ -12,11 +12,7 @@ import aiofiles
 import openpyxl
 from openpyxl.worksheet.worksheet import Worksheet
 
-from app.core.interfaces import (
-    IFileRepository,
-    IFileSystemManager,
-    IManifestRepository,
-)
+from app.core.interfaces import IFileRepository, IFileSystemManager, IManifestRepository
 from app.core.logger import app_logger
 from app.domain.entities import DocumentFile, ManifestItem
 from app.domain.exceptions import (
@@ -335,8 +331,8 @@ class FileSystemManager(IFileSystemManager):
         try:
             loop = asyncio.get_event_loop()
             await loop.run_in_executor(
-                None, path.mkdir, True, True
-            )  # parents=True, exist_ok=True
+                None, lambda: path.mkdir(parents=True, exist_ok=True)
+            )
 
             app_logger.debug("Directory created", extra={"directory": str(path)})
 

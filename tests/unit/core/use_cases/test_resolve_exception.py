@@ -1,10 +1,11 @@
-import pytest
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock
 
+import pytest
+
+from app.core.interfaces import CodeNotInManifestError, ExtractionFailedError
 from app.domain.entities import DocumentFile, DocumentStatus, ManifestItem
 from app.use_cases.resolve_exception import ResolveExceptionUseCase
-from app.core.interfaces import CodeNotInManifestError, ExtractionFailedError
 
 
 def _make_use_case(content_extractor, code_extractor, file_manager=None):

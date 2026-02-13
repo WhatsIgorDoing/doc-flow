@@ -1,13 +1,15 @@
-import pytest
 import shutil
 from pathlib import Path
+
+import pytest
+
+from app.infrastructure.database import DatabaseManager
 from app.infrastructure.repositories import (
-    ManifestRepository,
     FileRepository,
     FileSystemManager,
+    ManifestRepository,
 )
 from app.services.validation_service import ValidationService
-from app.infrastructure.database import DatabaseManager
 
 
 @pytest.fixture
@@ -48,9 +50,9 @@ async def test_import_official_manifest(official_manifest_path):
         None,
     )
     assert found is not None, "Não encontrou o item 5900.0130869.25.2-CZ6-CV-QUA-0001"
-    assert found.revision == "0" or found.revision == "", (
-        "Revisão incorreta"
-    )  # Mock pode variar
+    assert (
+        found.revision == "0" or found.revision == ""
+    ), "Revisão incorreta"  # Mock pode variar
     # O titulo na planilha é "Currículo - Qualidade..."
     assert "Currículo" in found.title or "Qualidade" in found.title
 
