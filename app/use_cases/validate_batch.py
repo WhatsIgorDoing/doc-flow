@@ -9,8 +9,12 @@ from typing import Dict, List
 
 from app.core.interfaces import IFileRepository, IManifestRepository
 from app.core.logger import app_logger
-from app.domain.entities import (DocumentFile, DocumentStatus, ManifestItem,
-                                 ValidationResult)
+from app.domain.entities import (
+    DocumentFile,
+    DocumentStatus,
+    ManifestItem,
+    ValidationResult,
+)
 
 
 class ValidateBatchUseCase:

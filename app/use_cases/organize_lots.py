@@ -6,8 +6,7 @@ Distribui documentos validados em lotes balanceados e move para diretório de sa
 from pathlib import Path
 from typing import Dict, List
 
-from app.core.interfaces import (IFileSystemManager, ILotBalancerService,
-                                 ITemplateFiller)
+from app.core.interfaces import IFileSystemManager, ILotBalancerService, ITemplateFiller
 from app.core.logger import app_logger
 from app.domain.entities import DocumentFile, DocumentGroup, OrganizationResult
 from app.domain.file_naming import get_filename_with_revision
