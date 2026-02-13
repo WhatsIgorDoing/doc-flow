@@ -109,9 +109,8 @@ class OpenpyxlTemplateFiller(ITemplateFiller):
 
         # Inserir e Preencher
         if all_rows_data:
-            # Insere linhas
-            if len(all_rows_data) > 0:
-                sheet.insert_rows(insert_row, amount=len(all_rows_data))
+            # Insere linhas (em lote para performance)
+            sheet.insert_rows(insert_row, amount=len(all_rows_data))
 
             # Preenche dados
             for i, row_data in enumerate(all_rows_data):
