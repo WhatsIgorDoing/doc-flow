@@ -5,7 +5,8 @@ Representam as entidades do banco de dados local.
 
 from datetime import datetime
 from typing import Optional
-from sqlmodel import SQLModel, Field
+
+from sqlmodel import Field, SQLModel
 
 
 class ValidatedDocument(SQLModel, table=True):

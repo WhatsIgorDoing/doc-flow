@@ -1,11 +1,12 @@
-import pytest
 import uuid
 from pathlib import Path
+
+import pytest
 from sqlmodel import Session, select
 
-from app.infrastructure.database import DatabaseManager
 from app.domain.entities import DocumentFile, DocumentStatus, ManifestItem
 from app.domain.models import ValidatedDocument
+from app.infrastructure.database import DatabaseManager
 
 
 # Fixture para banco de dados isolado
