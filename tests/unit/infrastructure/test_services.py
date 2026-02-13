@@ -3,6 +3,7 @@ from pathlib import Path
 from app.domain.entities import DocumentGroup, DocumentFile
 from app.infrastructure.services import GreedyLotBalancerService
 
+
 class TestGreedyLotBalancerService:
     def test_balance_lots_respects_max_docs_per_lot(self):
         """
@@ -46,8 +47,9 @@ class TestGreedyLotBalancerService:
 
         # Check that no lot has more than max_docs_per_lot
         for lot in lots:
-            assert len(lot.groups) <= max_docs_per_lot, \
-                f"Lot {lot.lot_name} has {len(lot.groups)} groups, exceeding limit {max_docs_per_lot}. Groups: {[g.document_code for g in lot.groups]} Size: {lot.total_size_bytes}"
+            assert (
+                len(lot.groups) <= max_docs_per_lot
+            ), f"Lot {lot.lot_name} has {len(lot.groups)} groups, exceeding limit {max_docs_per_lot}. Groups: {[g.document_code for g in lot.groups]} Size: {lot.total_size_bytes}"
 
     def test_balance_lots_empty_groups(self):
         """Test balancing empty list of groups."""
@@ -59,8 +61,12 @@ class TestGreedyLotBalancerService:
         """Test when max_docs_per_lot is larger than total groups."""
         service = GreedyLotBalancerService()
         groups = [
-            DocumentGroup(document_code="G1", files=[DocumentFile(path=Path("f1"), size_bytes=10)]),
-            DocumentGroup(document_code="G2", files=[DocumentFile(path=Path("f2"), size_bytes=10)])
+            DocumentGroup(
+                document_code="G1", files=[DocumentFile(path=Path("f1"), size_bytes=10)]
+            ),
+            DocumentGroup(
+                document_code="G2", files=[DocumentFile(path=Path("f2"), size_bytes=10)]
+            ),
         ]
         # max_docs=5, total=2. num_lots = ceil(2/5) = 1.
         lots = service.balance_lots(groups, 5)
@@ -71,8 +77,12 @@ class TestGreedyLotBalancerService:
         """Test when max_docs_per_lot is 1."""
         service = GreedyLotBalancerService()
         groups = [
-            DocumentGroup(document_code="G1", files=[DocumentFile(path=Path("f1"), size_bytes=10)]),
-            DocumentGroup(document_code="G2", files=[DocumentFile(path=Path("f2"), size_bytes=20)])
+            DocumentGroup(
+                document_code="G1", files=[DocumentFile(path=Path("f1"), size_bytes=10)]
+            ),
+            DocumentGroup(
+                document_code="G2", files=[DocumentFile(path=Path("f2"), size_bytes=20)]
+            ),
         ]
         # max_docs=1, total=2. num_lots = ceil(2/1) = 2.
         lots = service.balance_lots(groups, 1)
@@ -84,8 +94,12 @@ class TestGreedyLotBalancerService:
         """Test when max_docs_per_lot is invalid (<=0)."""
         service = GreedyLotBalancerService()
         groups = [
-            DocumentGroup(document_code="G1", files=[DocumentFile(path=Path("f1"), size_bytes=10)]),
-            DocumentGroup(document_code="G2", files=[DocumentFile(path=Path("f2"), size_bytes=10)])
+            DocumentGroup(
+                document_code="G1", files=[DocumentFile(path=Path("f1"), size_bytes=10)]
+            ),
+            DocumentGroup(
+                document_code="G2", files=[DocumentFile(path=Path("f2"), size_bytes=10)]
+            ),
         ]
         # max_docs=0 -> defaults to len(groups)=2 -> num_lots=1
         lots = service.balance_lots(groups, 0)

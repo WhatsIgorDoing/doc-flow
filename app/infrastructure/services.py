@@ -49,9 +49,7 @@ class GreedyLotBalancerService(ILotBalancerService):
         for group in sorted_groups:
             # Encontra o lote com o menor tamanho total em bytes,
             # respeitando o limite de documentos por lote
-            candidate_lots = [
-                lot for lot in lots if len(lot.groups) < max_docs_per_lot
-            ]
+            candidate_lots = [lot for lot in lots if len(lot.groups) < max_docs_per_lot]
 
             # Fallback de segurança: se por algum erro de cálculo não houver lotes disponíveis,
             # usa todos os lotes (evita crash, mas pode violar a regra de quantidade)

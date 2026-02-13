@@ -18,7 +18,6 @@ from app.domain.exceptions import (
     TemplateNotFoundError,
 )
 
-
 # ===== Interfaces (Protocols) =====
 
 
