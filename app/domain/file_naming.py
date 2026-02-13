@@ -59,5 +59,6 @@ def generate_unique_filename(target_path: Path) -> Path:
 
     # Fallback extremo: praticamente impossível chegar aqui
     import time
+
     ts = int(time.time())
     return parent / f"{stem}_{ts}{suffix}"

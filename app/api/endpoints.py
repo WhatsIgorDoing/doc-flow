@@ -65,7 +65,8 @@ class OrganizationRequest(BaseModel):
     """Request para organização de lotes."""
 
     validated_files: List[str] = Field(
-        default_factory=list, description="Lista de caminhos (opcional se usando sessão)"
+        default_factory=list,
+        description="Lista de caminhos (opcional se usando sessão)",
     )
     output_directory: str = Field(..., description="Diretório de saída para os lotes")
     max_docs_per_lot: int = Field(
@@ -239,17 +240,21 @@ async def organize_lots(request: OrganizationRequest):
 
         # Reconstruir DocumentFile objects não é mais necessário aqui
         # pois o service busca do banco de dados da sessão.
-        
+
         service = get_organization_service()
-        
+
         # Validar se diretório de saída existe ou criar
         output_dir = Path(request.output_directory)
         if not output_dir.exists():
             # Tentar criar? O ideal é o usuario criar, mas podemos tentar
-             try:
-                 output_dir.mkdir(parents=True, exist_ok=True)
-             except Exception:
-                 pass # Service vai lidar ou dar erro
+            try:
+                output_dir.mkdir(parents=True, exist_ok=True)
+            except Exception as e:
+                app_logger.warning(
+                    "Failed to create output directory",
+                    extra={"error": str(e), "directory": str(output_dir)},
+                )
+                # Service vai lidar ou dar erro
 
         result = await service.organize_session_lots(
             output_directory=output_dir,

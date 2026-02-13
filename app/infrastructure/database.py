@@ -1,6 +1,7 @@
 """
 Gerenciador de banco de dados SQLite usando Repository Pattern.
 """
+
 from typing import List
 
 from sqlmodel import SQLModel, create_engine, Session, select
@@ -32,14 +33,18 @@ class DatabaseManager:
 
         SQLModel.metadata.create_all(self.engine)
         self._initialized = True
-        app_logger.info("Database initialized", extra={"db_path": str(settings.get_database_path())})
+        app_logger.info(
+            "Database initialized", extra={"db_path": str(settings.get_database_path())}
+        )
 
     @property
     def session_id(self) -> str:
         """Retorna o ID da sessão atual."""
         return self.current_session_id
 
-    def save_validated_documents(self, session_id: str, documents: List[DocumentFile]) -> int:
+    def save_validated_documents(
+        self, session_id: str, documents: List[DocumentFile]
+    ) -> int:
         """
         Salva uma lista de documentos validados.
 

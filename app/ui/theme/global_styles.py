@@ -2,12 +2,14 @@
 Global CSS and Styles for the Application.
 Injects custom CSS for scrollbars, tracking, and glass effects.
 """
+
 from nicegui import ui
 from app.ui.theme.design_system import design
 
+
 def apply_global_styles():
     """Applies global CSS to the NiceGUI app."""
-    
+
     # Font import (Inter) - Optional if using system fonts, but good for consistency
     ui.add_head_html("""
     <style>
