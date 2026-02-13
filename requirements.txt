@@ -14,3 +14,6 @@ sqlalchemy
 greenlet
 psutil
 pywebview>=5.0.0
+python-docx
+PyPDF2
+PyYAML

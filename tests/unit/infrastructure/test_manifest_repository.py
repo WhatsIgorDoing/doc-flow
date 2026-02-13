@@ -28,8 +28,18 @@ async def test_load_from_file_success(mock_openpyxl_load):
 
     # Mockando acesso via iter_rows (usado no codigo: min_row=2, values_only=True)
     # Retorna uma lista de tuplas (row data)
-    mock_sheet.iter_rows.return_value = [
-        ("DOC-001", "A", "Titulo Doc 1", "Extra Valor")
+    # O código chama iter_rows 3 vezes:
+    # 1. Scanner de header (max_row=20)
+    # 2. Ler header cells (values_only=True)
+    # 3. Ler dados (min_row=header_row+1)
+
+    header_row = ("Document Code", "Revision", "Title", "Extra Column")
+    data_row = ("DOC-001", "A", "Titulo Doc 1", "Extra Valor")
+
+    mock_sheet.iter_rows.side_effect = [
+        [header_row, data_row], # 1. Scan (encontra header na row 1)
+        [header_row],           # 2. Get Header Names
+        [data_row]              # 3. Get Data
     ]
 
     # Mockando acesso via index (usado no codigo: sheet[1] para header)

@@ -169,6 +169,16 @@ async def validate_batch(request: ValidationRequest):
         )
 
         # Cria service com dependências
+        # Nota: Usamos Depends() no argumento da função se quisermos DI nativa do FastAPI,
+        # mas aqui estamos chamando direto. Para suportar testes com overrides,
+        # precisamos garantir que chamamos a função que o FastAPI interceptaria se fosse Depends.
+        # Mas 'get_validation_service()' é uma chamada direta de função aqui.
+        # dependency_overrides só funciona se usarmos Depends().
+
+        # Para permitir teste: vamos mudar para usar Depends, mas endpoints async
+        # geralmente pedem Depends na assinatura.
+        # Como refatoração rápida: vamos permitir que o teste patcheie esta função.
+
         service = get_validation_service()
 
         # Executa validação
