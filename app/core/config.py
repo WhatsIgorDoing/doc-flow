@@ -3,9 +3,10 @@ Configuração centralizada usando Pydantic Settings.
 Carrega variáveis de ambiente do arquivo .env com defaults seguros para desenvolvimento.
 """
 
-from pydantic_settings import BaseSettings, SettingsConfigDict
 from pathlib import Path
 from typing import Optional
+
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
