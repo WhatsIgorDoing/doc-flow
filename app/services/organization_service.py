@@ -2,17 +2,13 @@ from pathlib import Path
 from typing import List
 
 from app.core.logger import app_logger
-from app.domain.entities import (
-    DocumentFile,
-    DocumentStatus,
-    ManifestItem,
-    OrganizationResult,
-)
+from app.domain.entities import (DocumentFile, DocumentStatus, ManifestItem,
+                                 OrganizationResult)
 from app.domain.exceptions import OrganizationError
+from app.infrastructure.database import DatabaseManager
 from app.infrastructure.repositories import FileSystemManager
 from app.infrastructure.services import GreedyLotBalancerService
 from app.infrastructure.template_filler import OpenpyxlTemplateFiller
-from app.infrastructure.database import DatabaseManager
 from app.use_cases.organize_lots import OrganizeLotsUseCase
 
 

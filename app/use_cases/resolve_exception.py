@@ -6,19 +6,11 @@ Tenta extrair código de arquivo não identificado usando algoritmos de IA/Regex
 import re
 from typing import List
 
+from app.core.interfaces import (CodeNotInManifestError, ExtractionFailedError,
+                                 ICodeExtractor, IContentExtractor,
+                                 IFileSystemManager)
 from app.core.logger import app_logger
-from app.core.interfaces import (
-    ICodeExtractor,
-    IContentExtractor,
-    IFileSystemManager,
-    CodeNotInManifestError,
-    ExtractionFailedError,
-)
-from app.domain.entities import (
-    DocumentFile,
-    DocumentStatus,
-    ManifestItem,
-)
+from app.domain.entities import DocumentFile, DocumentStatus, ManifestItem
 from app.domain.file_naming import get_filename_with_revision
 
 

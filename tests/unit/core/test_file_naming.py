@@ -3,10 +3,12 @@ Testes unitários para app.domain.file_naming.
 Cobre get_filename_with_revision e generate_unique_filename.
 """
 
-import pytest
 from pathlib import Path
 
-from app.domain.file_naming import get_filename_with_revision, generate_unique_filename
+import pytest
+
+from app.domain.file_naming import (generate_unique_filename,
+                                    get_filename_with_revision)
 
 
 class TestGetFilenameWithRevision:

@@ -4,13 +4,13 @@ Gerenciador de banco de dados SQLite usando Repository Pattern.
 
 from typing import List
 
-from sqlmodel import SQLModel, create_engine, Session, select
 from sqlalchemy.pool import StaticPool
+from sqlmodel import Session, SQLModel, create_engine, select
 
 from app.core.config import settings
 from app.core.logger import app_logger
-from app.domain.models import ValidatedDocument
 from app.domain.entities import DocumentFile
+from app.domain.models import ValidatedDocument
 
 
 class DatabaseManager:
