@@ -14,6 +14,7 @@ from app.infrastructure.repositories import (
     FileSystemManager,
     ManifestRepository,
 )
+from app.infrastructure.exporters import ValidationResultsExporter
 from app.services.validation_service import ValidationService
 
 # Import New Design System
@@ -33,6 +34,7 @@ class ValidationDashboard:
         self.source_directory: Optional[str] = None
         self.is_validating: bool = False
         self._manifest_items = []  # Cached from last validation
+        self.last_validation_result = None
 
         # Refs
         self.results_section = None
@@ -65,14 +67,41 @@ class ValidationDashboard:
             root.withdraw()
             root.attributes("-topmost", True)
             if file:
-                return filedialog.askopenfilename(
+                res = filedialog.askopenfilename(
                     filetypes=[("Excel files", "*.xlsx *.xls")]
                 )
-            return filedialog.askdirectory()
+            else:
+                res = filedialog.askdirectory()
             root.destroy()
+            return res
 
         ui.notify(
             "Abrindo janela de seleção... Verifique sua barra de tarefas.",
+            type="info",
+            timeout=3000,
+        )
+        return await run.io_bound(_dialog)
+
+    async def _save_native_file_dialog(self):
+        """Helper for native save dialog."""
+
+        def _dialog():
+            import tkinter as tk
+            from tkinter import filedialog
+
+            root = tk.Tk()
+            root.withdraw()
+            root.attributes("-topmost", True)
+            path = filedialog.asksaveasfilename(
+                defaultextension=".xlsx",
+                filetypes=[("Excel files", "*.xlsx")],
+                title="Salvar Exportação",
+            )
+            root.destroy()
+            return path
+
+        ui.notify(
+            "Abrindo janela de salvamento... Verifique sua barra de tarefas.",
             type="info",
             timeout=3000,
         )
@@ -128,6 +157,7 @@ class ValidationDashboard:
 
             # Update UI
             self._update_status("Finalizando renderização...")
+            self.last_validation_result = result
             self.results_section.display_results(result)
             self._update_status(
                 f"Concluído: {len(result.validated_files)} validados, {len(result.unrecognized_files)} desconhecidos."
@@ -273,7 +303,27 @@ class ValidationDashboard:
                                 )
 
                 # 3. Results Section
-                self.results_section = ResultsList(on_resolve=self.resolve_selected)
+                self.results_section = ResultsList(
+                    on_resolve=self.resolve_selected, on_export=self.export_results
+                )
+
+    async def export_results(self) -> None:
+        """Exporta os resultados da validação para arquivo."""
+        if not self.last_validation_result:
+            ui.notify("Nenhum resultado para exportar.", type="warning")
+            return
+
+        path = await self._save_native_file_dialog()
+        if not path:
+            return
+
+        try:
+            exporter = ValidationResultsExporter()
+            exporter.export_to_excel(self.last_validation_result, Path(path))
+            ui.notify(f"Exportado com sucesso para: {path}", type="positive")
+        except Exception as e:
+            app_logger.error(f"Erro na exportação: {e}")
+            ui.notify(f"Erro ao exportar: {str(e)}", type="negative")
 
 
 @ui.page("/")

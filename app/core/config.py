@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     # Database
     DATABASE_PATH: str = "./data/sad_app.db"
     DATABASE_ECHO: bool = False  # SQL logging
+    SUPABASE_ENABLED: bool = False
 
     # Logging
     LOG_LEVEL: str = "INFO"

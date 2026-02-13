@@ -13,18 +13,31 @@ class ResultsList(GlassCard):
     Supports checkbox selection for unrecognized files.
     """
 
-    def __init__(self, on_resolve: Optional[Callable] = None):
+    def __init__(
+        self,
+        on_resolve: Optional[Callable] = None,
+        on_export: Optional[Callable] = None,
+    ):
         super().__init__()
         self.classes("w-full transition-all duration-500 hidden")
         self.style("min-height: 200px")
 
         self._on_resolve = on_resolve
+        self._on_export = on_export
         self._unrecognized_files: List[DocumentFile] = []
         self._checkboxes: dict = {}
 
         with self:
             with ui.row().classes("w-full items-center justify-between mb-6"):
-                ui.label("Resultados do Processamento").classes(design.typo.h3)
+                with ui.row().classes("items-center gap-4"):
+                    ui.label("Resultados do Processamento").classes(design.typo.h3)
+                    if self._on_export:
+                        ui.button(
+                            "Exportar Excel",
+                            icon="file_download",
+                            on_click=self._handle_export,
+                        ).props("flat dense text-color=primary")
+
                 self.status_label = ui.label("Aguardando...").classes(
                     "text-gray-400 font-medium"
                 )
@@ -183,3 +196,14 @@ class ResultsList(GlassCard):
                     await self._on_resolve(selected)
                 finally:
                     self.btn_resolve.props(remove="loading")
+
+    async def _handle_export(self):
+        """Triggers the export callback."""
+        if self._on_export:
+            # Handle both async and sync callbacks
+            import inspect
+
+            if inspect.iscoroutinefunction(self._on_export):
+                await self._on_export()
+            else:
+                self._on_export()
