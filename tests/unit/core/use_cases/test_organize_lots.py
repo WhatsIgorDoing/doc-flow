@@ -1,8 +1,10 @@
-import pytest
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from app.domain.entities import DocumentFile, DocumentGroup, ManifestItem, OutputLot
+import pytest
+
+from app.domain.entities import (DocumentFile, DocumentGroup, ManifestItem,
+                                 OutputLot)
 from app.use_cases.organize_lots import OrganizeLotsUseCase
 
 
