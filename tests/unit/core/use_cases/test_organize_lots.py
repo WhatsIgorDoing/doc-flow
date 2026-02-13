@@ -72,7 +72,7 @@ async def test_organize_lots_success():
 
     # - Deve ter movido o arquivo DOC-001.pdf para o diretório do lote
     # O nome seria o mesmo pois a revisão é "0" e não temos sufixo conflitante
-    # Ou se a lógica de _get_filename_with_revision adicionar _0, verificamos isso.
+    # Ou se a lógica de get_filename_with_revision adicionar _0, verificamos isso.
     # Assumindo que a lógica adiciona _rev se não existir.
     expected_dest_path = expected_lot_dir / "DOC-001_0.pdf" 
     mock_file_manager.move_file.assert_called_with(validated_file.path, expected_dest_path)
