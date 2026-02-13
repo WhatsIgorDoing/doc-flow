@@ -27,13 +27,35 @@ async def test_load_from_file_success(mock_openpyxl_load):
     # Row 2: Dados (Code, Rev, Title, Metadata...)
 
     # Mockando acesso via iter_rows (usado no codigo: min_row=2, values_only=True)
-    # Retorna uma lista de tuplas (row data)
-    # Primeiro retorno: Header scan
-    # Segundo retorno: Data scan
-    # Alterado "Document Code" para "code" para evitar falsos positivos na detecção de header repeat
-    mock_sheet.iter_rows.return_value = [
-        ("code", "Revision", "Title", "Extra Column"),
+    rows = [
+        ("Document Code", "Revision", "Title", "Extra Column"),
         ("DOC-001", "A", "Titulo Doc 1", "Extra Valor"),
+    ]
+
+    def iter_rows_side_effect(min_row=1, max_row=None, values_only=True):
+        # Adjust 1-based index to 0-based
+        start = min_row - 1
+        end = max_row if max_row else len(rows)
+        return rows[start:end]
+
+    mock_sheet.iter_rows.side_effect = iter_rows_side_effect
+
+    # Mockando acesso via index (usado no codigo: sheet[1] para header)
+    # sheet[1] retorna uma lista de Cells
+    mock_cell1 = MagicMock()
+    mock_cell1.value = "Document Code"
+    mock_cell2 = MagicMock()
+    mock_cell2.value = "Revision"
+    mock_cell3 = MagicMock()
+    mock_cell3.value = "Title"
+    mock_cell4 = MagicMock()
+    mock_cell4.value = "Extra Column"
+
+    mock_sheet.__getitem__.return_value = [
+        mock_cell1,
+        mock_cell2,
+        mock_cell3,
+        mock_cell4,
     ]
 
     repo = ManifestRepository()
