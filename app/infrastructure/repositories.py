@@ -318,6 +318,11 @@ class FileRepository(IFileRepository):
 class FileSystemManager(IFileSystemManager):
     """Gerenciador de operações do sistema de arquivos de forma assíncrona."""
 
+    @staticmethod
+    def _create_dir_sync(path: Path) -> None:
+        """Helper para criar diretório de forma síncrona com configurações seguras."""
+        path.mkdir(parents=True, exist_ok=True)
+
     async def create_directory(self, path: Path) -> None:
         """
         Cria um diretório e todos os pais necessários.
@@ -330,9 +335,8 @@ class FileSystemManager(IFileSystemManager):
         """
         try:
             loop = asyncio.get_event_loop()
-            await loop.run_in_executor(
-                None, path.mkdir, True, True
-            )  # parents=True, exist_ok=True
+            # Usa o helper estático para garantir passagem correta de argumentos
+            await loop.run_in_executor(None, self._create_dir_sync, path)
 
             app_logger.debug("Directory created", extra={"directory": str(path)})
 

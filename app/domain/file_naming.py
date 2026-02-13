@@ -3,6 +3,7 @@ Módulo compartilhado para lógica de nomenclatura de arquivos.
 Consolida helpers que estavam duplicados em organize_lots.py e template_filler.py.
 """
 
+import time
 from pathlib import Path
 
 
@@ -58,7 +59,5 @@ def generate_unique_filename(target_path: Path) -> Path:
             return candidate
 
     # Fallback extremo: praticamente impossível chegar aqui
-    import time
-
     ts = int(time.time())
     return parent / f"{stem}_{ts}{suffix}"
