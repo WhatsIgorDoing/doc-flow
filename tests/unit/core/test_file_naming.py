@@ -24,15 +24,13 @@ class TestGetFilenameWithRevision:
             ("DOC-123_0.pdf", "0", "DOC-123_0.pdf"),  # Numeric revision
             ("DOC-123.pdf", "", "DOC-123_.pdf"),  # Empty revision
             ("DOC.pdf", "Rev3", "DOC_Rev3.pdf"),  # Long revision
-
             # Edge cases
             (".gitignore", "A", ".gitignore_A"),  # Hidden file (expect fix)
             (".config", "v1", ".config_v1"),
             ("archive.tar.gz", "A", "archive.tar_A.gz"),
-            ("file.", "A", "file._A"), # Trailing dot
+            ("file.", "A", "file._A"),  # Trailing dot
             ("my file.pdf", "A", "my file_A.pdf"),  # Spaces
-            ("..dots", "A", "._A.dots"), # weird case, consistent with pathlib
-
+            ("..dots", "A", "._A.dots"),  # weird case, consistent with pathlib
             # Case sensitivity check
             ("file_a.pdf", "A", "file_a_A.pdf"),
         ],
