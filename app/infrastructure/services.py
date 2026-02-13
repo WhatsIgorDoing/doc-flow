@@ -2,6 +2,7 @@
 Serviços de domínio da infraestrutura.
 """
 
+import heapq
 import math
 from typing import List
 
@@ -41,13 +42,29 @@ class GreedyLotBalancerService(ILotBalancerService):
             num_lots = 1
 
         # 3. Inicializa os lotes de saída
-        lots: List[OutputLot] = [
-            OutputLot(lot_name=f"Lote_{i + 1}") for i in range(num_lots)
-        ]
+        # Armazena os lotes e mantém uma tupla para o heap: (tamanho_atual, indice, lote)
+        # O indice é usado para desempate estável
+        lots: List[OutputLot] = []
+        heap = []
 
-        # 4. Distribui os grupos para o lote atualmente mais leve (em bytes)
+        for i in range(num_lots):
+            lot = OutputLot(lot_name=f"Lote_{i + 1}")
+            lots.append(lot)
+            heapq.heappush(heap, (0, i, lot))
+
+        # 4. Distribui os grupos para o lote atualmente mais leve (em bytes) usando min-heap
         for group in sorted_groups:
-            lightest_lot = min(lots, key=lambda lot: lot.total_size_bytes)
+            # Pega o lote mais leve (O(1))
+            current_size, idx, lightest_lot = heapq.heappop(heap)
+
+            # Adiciona o grupo
             lightest_lot.groups.append(group)
+
+            # Calcula o tamanho do grupo uma única vez
+            group_size = group.total_size_bytes
+
+            # Atualiza e reinsere no heap (O(log M))
+            new_size = current_size + group_size
+            heapq.heappush(heap, (new_size, idx, lightest_lot))
 
         return lots
